@@ -7,3 +7,6 @@ dist/
 *.log
 .cloudflare/
 .vercel/
+
+# Empty leftover dir from create-astro, locked by OneDrive; delete later
+green-galaxy/

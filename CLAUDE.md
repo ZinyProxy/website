@@ -19,8 +19,8 @@
 8. If a step is unclear, ask Val ONE clarifying question — don't guess
 
 ## Stack Constraints
-- Astro 4.x (latest stable), TypeScript, no React unless necessary for interactive widgets
-- Cloudflare Pages for hosting
+- Astro 6.x (latest stable, installed 6.3.3), TypeScript strict, no React unless necessary for interactive widgets
+- Hosting: hosting.com cPanel static (Val decision 2026-05-18, overrides earlier Cloudflare Pages plan); DNS/CDN via Cloudflare; 301s via .htaccess
 - WordPress REST API for content (no GraphQL plugin, use built-in /wp-json/)
 - No client-side JS unless absolutely required — static HTML first
 - Tailwind CSS for styling (utility-first, matches current Elementor design vibe)
@@ -60,7 +60,7 @@ Before deploying anything to production:
 - Dev server: `npm run dev` (localhost:4321)
 - Build: `npm run build`
 - Preview build: `npm run preview`
-- Deploy to Cloudflare Pages: `npx wrangler pages deploy ./dist`
+- Deploy: push to GitHub, cPanel Git Version Control pulls + runs .cpanel.yml to publish ./dist to the testing URL docroot
 
 ## Git Workflow
 - main branch = staging
