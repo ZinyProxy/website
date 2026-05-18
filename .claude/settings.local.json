@@ -20,7 +20,14 @@
       "Bash(node -p \"require\\('./package.json'\\).dependencies\")",
       "Bash(npm run *)",
       "Bash(grep -oE \"available:.{0,40}\" dist/index.html)",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Add Tailwind/sitemap/RSS, base SEO layout, typed WP API client; build green\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Add Tailwind/sitemap/RSS, base SEO layout, typed WP API client; build green\")",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git remote *)",
+      "Bash(git ls-remote *)",
+      "Bash(git -c credential.interactive=false push -u origin main)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Add cPanel Pattern A deploy: .cpanel.yml + npm run deploy script\")",
+      "Bash(git push *)"
     ]
   }
 }

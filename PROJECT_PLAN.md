@@ -1,12 +1,15 @@
 # Ziny Headless Rebuild — Project Plan
 
 ## Phase 1: Environment Setup (Day 1-2)
-- [ ] Install Node.js 20+ if not already installed
-- [ ] Install Git if not already installed
-- [ ] Initialize Astro project in this folder
-- [ ] Test WordPress REST API connection to ziny.io
-- [ ] Set up Cloudflare Pages account
-- [ ] Create GitHub repo for project
+- [x] Install Node.js 20+ (v24.15.0)
+- [x] Install Git (2.50.1)
+- [x] Initialize Astro project in this folder (Astro 6.3.3, static, strict TS)
+- [x] Test WordPress REST API connection to ziny.io (200; 80 posts / 61 pages)
+- [x] Add core integrations (Tailwind v4, sitemap, RSS, SEO layout, WP client)
+- [x] Verify build pipeline (build green, astro check 0 errors)
+- [~] Hosting decided: hosting.com cPanel static (replaces Cloudflare Pages)
+- [ ] Create GitHub repo + push (needs Val: account/repo)
+- [ ] Set up cPanel Git deploy to testing URL (needs cPanel details)
 
 ## Phase 2: Design System (Week 1)
 - [ ] Extract color palette from ziny.io (pinks, purples, blacks)

@@ -1,0 +1,8 @@
+---
+# cPanel Git™ Version Control deployment.
+# Runs on the `deploy` branch, whose repo root contains the built `dist/`.
+# Triggered from cPanel: "Update from Remote" then "Deploy HEAD Commit".
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/eabuiltc/web.ziny.io/
+    - /bin/cp -R dist/. "$DEPLOYPATH"

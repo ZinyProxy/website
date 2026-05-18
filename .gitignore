@@ -10,3 +10,6 @@ dist/
 
 # Empty leftover dir from create-astro, locked by OneDrive; delete later
 green-galaxy/
+
+# Transient git worktree used by `npm run deploy`
+.deploy-tmp/

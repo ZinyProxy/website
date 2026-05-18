@@ -39,6 +39,13 @@ Serve all public traffic from a fast static frontend.
 - Forms/CTAs: Link out to dashboard.ziny.io (separate Laravel app)
 - Images: Astro built-in image optimization, served static via cPanel + Cloudflare CDN
 
+## Repo & Deploy
+- GitHub: https://github.com/ZinyProxy/website.git (org: ZinyProxy)
+- `main` = Astro source (staging). Pushed 2026-05-18.
+- Deploy pattern A: build locally -> commit `dist/` to a `deploy` branch ->
+  cPanel Git Version Control pulls `deploy` -> `.cpanel.yml` copies to docroot
+- cPanel testing URL + docroot: TBD (awaiting Val)
+
 ## Architecture Decisions Locked (2026-05-18)
 1. Render mode: 100% static, Astro fetches WP REST at build time
 2. Host/deploy target: hosting.com cPanel static (testing URL first, then prod)
