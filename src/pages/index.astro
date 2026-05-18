@@ -1,17 +1,25 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import { wpHealthCheck } from '../lib/wp';
 
+// Build-time smoke test: proves the headless WordPress pipeline works.
+// Replaced by the real homepage in Phase 3.
+const wp = await wpHealthCheck();
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout
+  title="Ziny — Headless rebuild (Phase 1)"
+  description="Foundation scaffold. Real site lands in Phase 3."
+>
+  <main class="mx-auto max-w-2xl p-8 font-sans">
+    <h1 class="text-2xl font-bold">Ziny Astro foundation ✓</h1>
+    <p class="mt-4 text-gray-700">
+      Static Astro 6 build, pulling content from headless WordPress.
+    </p>
+    <ul class="mt-4 list-disc pl-6 text-gray-700">
+      <li>WP API: <code>{import.meta.env.WP_API_URL}</code></li>
+      <li>Posts available: <strong>{wp.posts}</strong></li>
+      <li>Pages available: <strong>{wp.pages}</strong></li>
+    </ul>
+  </main>
+</Layout>

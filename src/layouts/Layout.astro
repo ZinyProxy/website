@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+
+/**
+ * Base HTML shell. SEO is intentionally minimal here — Phase 5 wires in
+ * Yoast's `yoast_head_json` from the WordPress REST API for full
+ * title/meta/OG/schema parity. These props are the fallback contract.
+ */
+export interface Props {
+  title: string;
+  description?: string;
+  /** Canonical URL. Defaults to the current page URL on `site`. */
+  canonical?: string;
+  /** Raw <head> HTML from Yoast (yoast_head). Injected verbatim in Phase 5. */
+  yoastHead?: string;
+}
+
+const { title, description, canonical, yoastHead } = Astro.props;
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {yoastHead ? (
+      <Fragment set:html={yoastHead} />
+    ) : (
+      <>
+        <title>{title}</title>
+        {description && <meta name="description" content={description} />}
+        <link rel="canonical" href={canonicalURL} />
+        <meta property="og:title" content={title} />
+        {description && <meta property="og:description" content={description} />}
+        <meta property="og:url" content={canonicalURL} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </>
+    )}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

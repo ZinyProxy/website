@@ -1,6 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
+import tailwindcss from '@tailwindcss/vite';
+import sitemap from '@astrojs/sitemap';
+
 // https://astro.build/config
 export default defineConfig({
   // Canonical production URL — used for sitemap, canonical tags, RSS.
@@ -14,6 +17,7 @@ export default defineConfig({
   // trailing slash, e.g. /best-pirate-bay-proxy/ . 'directory' format emits
   // <slug>/index.html so the served URL keeps the trailing slash exactly.
   trailingSlash: 'always',
+
   build: {
     format: 'directory',
   },
@@ -22,4 +26,10 @@ export default defineConfig({
     // Allow Astro <Image> to optimize remote WordPress-hosted media.
     domains: ['ziny.io'],
   },
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
+
+  integrations: [sitemap()],
 });

@@ -14,7 +14,13 @@
       "PowerShell(Move-Item *)",
       "PowerShell(Get-ChildItem *)",
       "PowerShell(Remove-Item *)",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Scaffold Astro 6 static project \\(strict TS, trailing-slash URL preservation\\)\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Scaffold Astro 6 static project \\(strict TS, trailing-slash URL preservation\\)\")",
+      "Bash(npx astro *)",
+      "Bash(npm i *)",
+      "Bash(node -p \"require\\('./package.json'\\).dependencies\")",
+      "Bash(npm run *)",
+      "Bash(grep -oE \"available:.{0,40}\" dist/index.html)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Add Tailwind/sitemap/RSS, base SEO layout, typed WP API client; build green\")"
     ]
   }
 }
