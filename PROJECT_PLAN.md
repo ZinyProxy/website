@@ -8,8 +8,9 @@
 - [x] Add core integrations (Tailwind v4, sitemap, RSS, SEO layout, WP client)
 - [x] Verify build pipeline (build green, astro check 0 errors)
 - [~] Hosting decided: hosting.com cPanel static (replaces Cloudflare Pages)
-- [ ] Create GitHub repo + push (needs Val: account/repo)
-- [ ] Set up cPanel Git deploy to testing URL (needs cPanel details)
+- [x] Create GitHub repo + push (ZinyProxy/website, main + deploy pushed)
+- [x] Deploy automation built (npm run deploy → deploy branch + .cpanel.yml)
+- [ ] Val: configure cPanel Git Version Control for web.ziny.io (manual UI)
 
 ## Phase 2: Design System (Week 1)
 - [ ] Extract color palette from ziny.io (pinks, purples, blacks)

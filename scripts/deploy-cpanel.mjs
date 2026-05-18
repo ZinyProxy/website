@@ -14,11 +14,10 @@ import { join } from 'node:path';
 const WT = '.deploy-tmp';
 const git = (...args) => execFileSync('git', args, { stdio: 'pipe' }).toString().trim();
 const gitIO = (...args) => execFileSync('git', args, { stdio: 'inherit' });
-const run = (cmd, args) => execFileSync(cmd, args, { stdio: 'inherit', shell: false });
-
-// 1. Fresh production build.
+// 1. Fresh production build (call Astro's bin directly — cross-platform,
+//    avoids the Windows npm.cmd spawn EINVAL).
 console.log('▶ Building…');
-run(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'build']);
+execFileSync(process.execPath, ['node_modules/astro/bin/astro.mjs', 'build'], { stdio: 'inherit' });
 if (!existsSync('dist')) throw new Error('dist/ missing after build');
 
 // 2. Clean any stale worktree.

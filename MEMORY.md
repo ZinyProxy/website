@@ -42,9 +42,12 @@ Serve all public traffic from a fast static frontend.
 ## Repo & Deploy
 - GitHub: https://github.com/ZinyProxy/website.git (org: ZinyProxy)
 - `main` = Astro source (staging). Pushed 2026-05-18.
-- Deploy pattern A: build locally -> commit `dist/` to a `deploy` branch ->
-  cPanel Git Version Control pulls `deploy` -> `.cpanel.yml` copies to docroot
-- cPanel testing URL + docroot: TBD (awaiting Val)
+- Deploy pattern A: `npm run deploy` builds + publishes orphan `deploy` branch
+  (dist/ + .cpanel.yml) -> cPanel Git Version Control pulls -> copies to docroot
+- Testing URL: web.ziny.io
+- cPanel user: eabuiltc | docroot: /home/eabuiltc/web.ziny.io/
+- Deploy: `npm run deploy`, then cPanel Git VC: Update from Remote -> Deploy HEAD
+- `deploy` branch pushed to origin 2026-05-18 (first build)
 
 ## Architecture Decisions Locked (2026-05-18)
 1. Render mode: 100% static, Astro fetches WP REST at build time
