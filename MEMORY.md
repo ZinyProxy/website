@@ -48,8 +48,13 @@ Serve all public traffic from a fast static frontend.
   approach was abandoned 2026-05-18. `.cpanel.yml` (on main) copies dist/. to docroot.
 - Trade-off accepted: build artifacts live in `main` history (pragmatic for
   cPanel's single-branch Git VC + non-dev operator).
-- Testing URL: web.ziny.io
+- Testing URL: https://web.ziny.io — LIVE (valid Let's Encrypt SSL via AutoSSL)
 - cPanel user: eabuiltc | docroot: /home/eabuiltc/web.ziny.io/
+- DNS: web.ziny.io A record added in Cloudflare, grey-cloud, -> origin 209.42.17.217
+- REALITY: cPanel Git Version Control checkout/deploy was unreliable on this
+  shared plan (cloned but did not populate working tree; .cpanel.yml hook
+  appears disabled). Working deploy = build locally then zip-upload dist/
+  contents into docroot via cPanel File Manager. Smoother deploy = Phase 7 task.
 - Deploy: `npm run deploy`, then cPanel Git VC: Update from Remote -> Deploy HEAD
 - `deploy` branch pushed to origin 2026-05-18 (first build)
 

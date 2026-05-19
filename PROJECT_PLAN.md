@@ -7,10 +7,14 @@
 - [x] Test WordPress REST API connection to ziny.io (200; 80 posts / 61 pages)
 - [x] Add core integrations (Tailwind v4, sitemap, RSS, SEO layout, WP client)
 - [x] Verify build pipeline (build green, astro check 0 errors)
-- [~] Hosting decided: hosting.com cPanel static (replaces Cloudflare Pages)
-- [x] Create GitHub repo + push (ZinyProxy/website, main + deploy pushed)
-- [x] Deploy automation built (npm run deploy → deploy branch + .cpanel.yml)
-- [ ] Val: configure cPanel Git Version Control for web.ziny.io (manual UI)
+- [x] Hosting: hosting.com cPanel static (replaces Cloudflare Pages)
+- [x] Create GitHub repo + push (ZinyProxy/website, main)
+- [x] LIVE: https://web.ziny.io serving the build, valid Let's Encrypt SSL
+- [x] Deploy method: `npm run deploy` (build+push) then zip-upload dist to
+      docroot via File Manager. cPanel Git VC checkout was unreliable on this
+      shared plan — revisit a smoother deploy in Phase 7.
+
+**PHASE 1 COMPLETE ✅ — pipeline proven end-to-end on web.ziny.io**
 
 ## Phase 2: Design System (Week 1)
 - [ ] Extract color palette from ziny.io (pinks, purples, blacks)

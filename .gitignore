@@ -7,5 +7,8 @@ node_modules/
 .cloudflare/
 .vercel/
 
+# Deploy upload artifact (built from dist/, regenerated on demand)
+web-ziny-upload.zip
+
 # Empty leftover dir from create-astro, locked by OneDrive; delete later
 green-galaxy/

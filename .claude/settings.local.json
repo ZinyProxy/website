@@ -36,7 +36,9 @@
       "Bash(openssl x509 *)",
       "Bash(git worktree *)",
       "Bash(git branch *)",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Switch deploy strategy: dist tracked on main \\(cPanel single-branch constraint\\)\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Switch deploy strategy: dist tracked on main \\(cPanel single-branch constraint\\)\")",
+      "Bash(rm -f web-ziny-upload.zip)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 1 complete: web.ziny.io live with SSL; record deploy reality\")"
     ]
   }
 }
