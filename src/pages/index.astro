@@ -2,24 +2,47 @@
 import Layout from '../layouts/Layout.astro';
 import { wpHealthCheck } from '../lib/wp';
 
-// Build-time smoke test: proves the headless WordPress pipeline works.
-// Replaced by the real homepage in Phase 3.
 const wp = await wpHealthCheck();
+
+// Full literal classes (Tailwind v4 can't see dynamically built names).
+const swatches = [
+  ['bg-brand', 'Primary pink #B0549E'],
+  ['bg-purple', 'Secondary #5F4C9F'],
+  ['bg-tint', 'Pale tint #F8EBFF'],
+  ['bg-accent-orange', 'Stars #F37820'],
+  ['bg-ink-800', 'Ink 800 #191A1B'],
+  ['bg-ink-850', 'Ink 850 #141516'],
+  ['bg-ink-900 border border-white/20', 'Ink 900 #08090A'],
+  ['bg-muted', 'Muted #D3D3D3'],
+] as const;
 ---
 
 <Layout
-  title="Ziny — Headless rebuild (Phase 1)"
-  description="Foundation scaffold. Real site lands in Phase 3."
+  title="Ziny — Design System (Phase 2)"
+  description="Design tokens + fonts extracted from ziny.io."
 >
-  <main class="mx-auto max-w-2xl p-8 font-sans">
-    <h1 class="text-2xl font-bold">Ziny Astro foundation ✓</h1>
-    <p class="mt-4 text-gray-700">
-      Static Astro 6 build, pulling content from headless WordPress.
+  <main class="mx-auto max-w-3xl px-6 py-12">
+    <p class="text-brand font-body text-sm uppercase tracking-widest">Phase 2 · Design System</p>
+    <h1 class="mt-2 text-5xl font-bold">Prompt heading — 700</h1>
+    <h3 class="mt-2 text-xl font-medium text-muted">Prompt subheading — 500</h3>
+    <p class="mt-4 font-body text-white/80">
+      Body copy in Roboto. Pipeline live: WP API has
+      <strong class="text-brand">{wp.posts}</strong> posts /
+      <strong class="text-brand">{wp.pages}</strong> pages.
     </p>
-    <ul class="mt-4 list-disc pl-6 text-gray-700">
-      <li>WP API: <code>{import.meta.env.WP_API_URL}</code></li>
-      <li>Posts available: <strong>{wp.posts}</strong></li>
-      <li>Pages available: <strong>{wp.pages}</strong></li>
-    </ul>
+
+    <div class="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {swatches.map(([cls, label]) => (
+        <div class="rounded-lg border border-white/10 p-3">
+          <div class:list={['h-14 w-full rounded-md', cls]}></div>
+          <p class="mt-2 font-body text-xs text-white/70">{label}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-10 flex gap-4">
+      <span class="rounded-md bg-brand px-6 py-3 font-body font-medium text-white">Primary button</span>
+      <span class="rounded-md border border-brand px-6 py-3 font-body font-medium text-brand">Secondary</span>
+    </div>
   </main>
 </Layout>

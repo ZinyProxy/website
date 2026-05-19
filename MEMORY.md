@@ -77,6 +77,17 @@ Get Data Guarantee + Use Pre-Configured Proxies sections
 Customer Support section with 3 cards
 Footer
 
+## Design System (extracted from live ziny.io Elementor kit, 2026-05-18)
+- Heading font: **Prompt** (700 for h1/h2, 500 h3, 400 h4) — child theme
+  overrides Elementor's Montserrat default; Prompt is what renders
+- Body font: **Roboto** 400
+- Brand primary (pink): #B0549E  | secondary (purple): #5F4C9F
+- Dark section backgrounds: #08090A, #141516, #191A1B, #1A1919
+- Pale purple tint: #F8EBFF | muted gray: #D3D3D3
+- Star/rating accent: #F37820 (orange)
+- Heading sizes: h1 60px / h2 50px / h3 20px / h4 18px (desktop)
+- Plan: self-host Prompt + Roboto via @fontsource (speed = project goal)
+
 ## URL Preservation Rules (CRITICAL)
 - Blog: /best-pirate-bay-proxy/ → must stay exactly /best-pirate-bay-proxy/
 - All 81 article URLs preserved

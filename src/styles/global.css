@@ -1,3 +1,40 @@
 @import "tailwindcss";
 
-/* Ziny design tokens (colors, fonts) added in Phase 2 from current ziny.io. */
+/*
+ * Ziny design tokens — extracted from live ziny.io Elementor kit (2026-05-18).
+ * Tailwind v4 @theme: each var generates utilities (e.g. --color-brand
+ * -> bg-brand / text-brand / border-brand; --font-heading -> font-heading).
+ */
+@theme {
+  /* Brand */
+  --color-brand: #b0549e;        /* primary pink/magenta */
+  --color-brand-dark: #934185;
+  --color-purple: #5f4c9f;       /* secondary */
+  --color-tint: #f8ebff;         /* pale purple wash */
+  --color-accent-orange: #f37820;/* rating stars */
+
+  /* Near-black section backgrounds (light → dark) */
+  --color-ink-800: #191a1b;
+  --color-ink-850: #141516;
+  --color-ink-900: #08090a;
+
+  /* Neutrals */
+  --color-muted: #d3d3d3;
+
+  /* Typography */
+  --font-heading: "Prompt", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Roboto", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Base: dark site, Roboto body, Prompt headings (matches current ziny.io). */
+@layer base {
+  body {
+    background-color: var(--color-ink-900);
+    color: #ffffff;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+}
