@@ -29,7 +29,13 @@
       "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Add cPanel Pattern A deploy: .cpanel.yml + npm run deploy script\")",
       "Bash(git push *)",
       "Bash(node -e \"console.log\\(require\\('astro/package.json'\\).bin\\)\")",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Fix deploy script \\(call Astro bin directly\\); record cPanel target web.ziny.io\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Fix deploy script \\(call Astro bin directly\\); record cPanel target web.ziny.io\")",
+      "Bash(nslookup web.ziny.io 8.8.8.8)",
+      "Bash(nslookup ziny.io 8.8.8.8)",
+      "Bash(timeout 15 openssl s_client -connect web.ziny.io:443 -servername web.ziny.io)",
+      "Bash(openssl x509 *)",
+      "Bash(git worktree *)",
+      "Bash(git branch *)"
     ]
   }
 }
