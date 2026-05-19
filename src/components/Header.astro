@@ -1,0 +1,24 @@
+---
+import Container from './Container.astro';
+import Logo from './Logo.astro';
+import Button from './Button.astro';
+import { NAV, DASHBOARD } from '../config';
+---
+<header class="sticky top-0 z-50 border-b border-white/10 bg-ink-900/90 backdrop-blur">
+  <Container class="flex h-16 items-center justify-between gap-6">
+    <Logo />
+
+    <nav class="hidden items-center gap-7 lg:flex">
+      {NAV.map((i) => (
+        <a href={i.href} class="font-body text-sm text-white/75 transition-colors hover:text-brand">
+          {i.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <Button href={DASHBOARD.login} variant="ghost" external class="hidden sm:inline-flex">Login</Button>
+      <Button href={DASHBOARD.register} variant="primary" external>Get Started</Button>
+    </div>
+  </Container>
+</header>

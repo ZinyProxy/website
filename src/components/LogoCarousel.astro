@@ -1,0 +1,34 @@
+---
+/** Infinite CSS marquee of partner names. No JS. List duplicated for seamless loop. */
+const brands = ['Octoparse', 'Firecrawl', 'DICLOAK', 'AdsPower', 'Puppeteer', 'Crawlee', 'Outscraper'];
+const loop = [...brands, ...brands];
+---
+<div class="ziny-marquee group relative overflow-hidden">
+  <div class="ziny-track flex w-max gap-14 group-hover:[animation-play-state:paused]">
+    {loop.map((b, i) => (
+      <span
+        aria-hidden={i >= brands.length ? 'true' : undefined}
+        class="font-heading text-lg font-semibold tracking-wide text-white/40 transition-colors hover:text-white/70"
+      >
+        {b}
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .ziny-marquee {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .ziny-track {
+    animation: ziny-scroll 26s linear infinite;
+  }
+  @keyframes ziny-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ziny-track { animation: none; }
+  }
+</style>

@@ -1,0 +1,11 @@
+---
+interface Props { flag: string; country: string; note?: string }
+const { flag, country, note } = Astro.props;
+---
+<div class="flex items-center gap-3 rounded-xl border border-white/10 bg-ink-850 px-4 py-3 transition-colors hover:border-brand/50">
+  <span class="text-2xl leading-none" aria-hidden="true">{flag}</span>
+  <div>
+    <span class="block font-heading text-sm font-semibold text-white">{country}</span>
+    {note && <span class="font-body text-xs text-white/50">{note}</span>}
+  </div>
+</div>

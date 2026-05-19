@@ -1,48 +1,123 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { wpHealthCheck } from '../lib/wp';
+import Container from '../components/Container.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Globe from '../components/Globe.astro';
+import Button from '../components/Button.astro';
+import LogoCarousel from '../components/LogoCarousel.astro';
+import PricingCard from '../components/PricingCard.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import LocationCard from '../components/LocationCard.astro';
+import { DASHBOARD } from '../config';
 
-const wp = await wpHealthCheck();
+const pricing = [
+  { name: 'Residential', price: '$3.50', blurb: '99.9M+ ethically sourced IPs', features: ['Pay as you go', 'City & ASN targeting', 'Unlimited concurrency', 'Sticky & rotating'] },
+  { name: 'Mobile', price: '$7.00', blurb: 'Real 4G/5G carrier IPs', features: ['Hardest to detect', 'Global carriers', 'Unlimited threads', 'API access'], featured: true },
+  { name: 'ISP', price: '$2.40', blurb: 'Static residential speed', features: ['Datacenter speed', 'Residential trust', 'Unlimited bandwidth', '99.9% uptime'] },
+];
 
-// Full literal classes (Tailwind v4 can't see dynamically built names).
-const swatches = [
-  ['bg-brand', 'Primary pink #B0549E'],
-  ['bg-purple', 'Secondary #5F4C9F'],
-  ['bg-tint', 'Pale tint #F8EBFF'],
-  ['bg-accent-orange', 'Stars #F37820'],
-  ['bg-ink-800', 'Ink 800 #191A1B'],
-  ['bg-ink-850', 'Ink 850 #141516'],
-  ['bg-ink-900 border border-white/20', 'Ink 900 #08090A'],
-  ['bg-muted', 'Muted #D3D3D3'],
-] as const;
+const reviews = [
+  { quote: 'Switched from a big-name provider and our scraping success rate jumped to 99%. Support actually replies.', name: 'Marcus L.', role: 'Data Engineer' },
+  { quote: 'Cleanest residential pool we have tested. Zero blocks on the targets that used to kill us.', name: 'Priya S.', role: 'Growth Lead' },
+  { quote: 'Mobile proxies are the real deal — sticky sessions hold and the dashboard is dead simple.', name: 'Tomáš K.', role: 'Founder' },
+];
+
+const locations = [
+  { flag: '🇺🇸', country: 'United States' }, { flag: '🇬🇧', country: 'United Kingdom' },
+  { flag: '🇩🇪', country: 'Germany' }, { flag: '🇫🇷', country: 'France' },
+  { flag: '🇨🇦', country: 'Canada' }, { flag: '🇯🇵', country: 'Japan' },
+  { flag: '🇦🇺', country: 'Australia' }, { flag: '🇨🇳', country: 'China' },
+];
 ---
 
-<Layout
-  title="Ziny — Design System (Phase 2)"
-  description="Design tokens + fonts extracted from ziny.io."
->
-  <main class="mx-auto max-w-3xl px-6 py-12">
-    <p class="text-brand font-body text-sm uppercase tracking-widest">Phase 2 · Design System</p>
-    <h1 class="mt-2 text-5xl font-bold">Prompt heading — 700</h1>
-    <h3 class="mt-2 text-xl font-medium text-muted">Prompt subheading — 500</h3>
-    <p class="mt-4 font-body text-white/80">
-      Body copy in Roboto. Pipeline live: WP API has
-      <strong class="text-brand">{wp.posts}</strong> posts /
-      <strong class="text-brand">{wp.pages}</strong> pages.
-    </p>
+<Layout title="Ziny — Clean & Private Proxies, #1 Performance" description="Residential, mobile, ISP and datacenter proxies built for speed and reliability.">
+  <Header />
 
-    <div class="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {swatches.map(([cls, label]) => (
-        <div class="rounded-lg border border-white/10 p-3">
-          <div class:list={['h-14 w-full rounded-md', cls]}></div>
-          <p class="mt-2 font-body text-xs text-white/70">{label}</p>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="pointer-events-none absolute -top-40 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-purple/20 blur-3xl"></div>
+    <Container class="relative grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-28">
+      <div>
+        <span class="inline-block rounded-full border border-brand/40 bg-brand/10 px-4 py-1 font-body text-xs font-medium uppercase tracking-widest text-brand">
+          #1 Performance
+        </span>
+        <h1 class="mt-5 font-heading text-5xl font-bold leading-tight text-white sm:text-6xl">
+          Clean &amp; Private<br /><span class="text-brand">Unrestricted</span> Proxies
+        </h1>
+        <p class="mt-5 max-w-md font-body text-lg text-white/65">
+          Residential, mobile, ISP and datacenter proxies engineered for the highest success rates — without the bloat.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <Button href={DASHBOARD.register} external size="lg">Get Started</Button>
+          <Button href="/pricing/" variant="ghost" size="lg">View Pricing</Button>
         </div>
-      ))}
-    </div>
+      </div>
+      <div class="flex justify-center">
+        <Globe />
+      </div>
+    </Container>
+  </section>
 
-    <div class="mt-10 flex gap-4">
-      <span class="rounded-md bg-brand px-6 py-3 font-body font-medium text-white">Primary button</span>
-      <span class="rounded-md border border-brand px-6 py-3 font-body font-medium text-brand">Secondary</span>
-    </div>
-  </main>
+  <!-- Trust strip -->
+  <section class="border-y border-white/10 py-8">
+    <Container>
+      <p class="mb-6 text-center font-body text-xs uppercase tracking-widest text-white/40">
+        Trusted with the tools your team already uses
+      </p>
+      <LogoCarousel />
+    </Container>
+  </section>
+
+  <!-- Pricing -->
+  <section class="py-20">
+    <Container>
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="font-heading text-4xl font-bold text-white">Simple, scalable pricing</h2>
+        <p class="mt-3 font-body text-white/60">Pay only for what you use. No contracts, no surprises.</p>
+      </div>
+      <div class="mt-12 grid gap-6 lg:grid-cols-3">
+        {pricing.map((p) => <PricingCard {...p} />)}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Reviews -->
+  <section class="bg-ink-850 py-20">
+    <Container>
+      <h2 class="text-center font-heading text-4xl font-bold text-white">Happy customers</h2>
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        {reviews.map((r) => <ReviewCard {...r} />)}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Locations -->
+  <section class="py-20">
+    <Container>
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="font-heading text-4xl font-bold text-white">Global proxy locations</h2>
+        <p class="mt-3 font-body text-white/60">195+ countries with city-level targeting.</p>
+      </div>
+      <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {locations.map((l) => <LocationCard {...l} />)}
+      </div>
+    </Container>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20">
+    <Container>
+      <div class="rounded-3xl border border-brand/30 bg-gradient-to-br from-purple/20 to-brand/10 px-8 py-14 text-center">
+        <h2 class="font-heading text-4xl font-bold text-white">Start in minutes</h2>
+        <p class="mx-auto mt-3 max-w-md font-body text-white/65">Create an account and get instant access to the full proxy network.</p>
+        <div class="mt-8 flex justify-center gap-4">
+          <Button href={DASHBOARD.register} external size="lg">Get Started</Button>
+          <Button href={DASHBOARD.login} external variant="ghost" size="lg">Login</Button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <Footer />
 </Layout>

@@ -41,7 +41,11 @@
       "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 1 complete: web.ziny.io live with SSL; record deploy reality\")",
       "Read(//tmp/**)",
       "Bash(node -p \"Object.keys\\(require\\('./package.json'\\).dependencies\\)\")",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 2: Tailwind design tokens + self-hosted Prompt/Roboto fonts; token preview page\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 2: Tailwind design tokens + self-hosted Prompt/Roboto fonts; token preview page\")",
+      "Bash(grep -oiE '>[^<]+$')",
+      "Bash(grep -oiE '<h[12][^>]*>[^<]{4,90}' /tmp/z.html)",
+      "Bash(grep -oiE '<a [^>]*href=\"https://ziny.io/[a-z-]*/?\"[^>]*>[^<]{2,40}</a>' /tmp/z.html)",
+      "Bash(grep -oiE 'Clean &amp; Private[^<]*|Unrestricted Proxies[^<]*|#1[^<]{0,40}' /tmp/z.html)"
     ]
   }
 }

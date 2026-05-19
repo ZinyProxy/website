@@ -1,0 +1,55 @@
+---
+/**
+ * Lightweight wireframe globe. Pure SVG + CSS — no D3, no JS, no canvas.
+ * Longitude ellipses animate their rx to fake a slow rotation. Honors
+ * prefers-reduced-motion (animation freezes).
+ */
+interface Props { class?: string }
+const { class: cls = '' } = Astro.props;
+const lons = [0, 1, 2, 3, 4, 5];
+---
+<div class:list={['relative aspect-square w-full max-w-[480px]', cls]}>
+  <div class="ziny-glow absolute inset-[12%] rounded-full"></div>
+  <svg viewBox="0 0 200 200" class="relative h-full w-full" role="img" aria-label="Global proxy network">
+    <defs>
+      <radialGradient id="sphere" cx="38%" cy="34%" r="75%">
+        <stop offset="0%" stop-color="#3a2740" />
+        <stop offset="55%" stop-color="#1a1320" />
+        <stop offset="100%" stop-color="#0c0910" />
+      </radialGradient>
+    </defs>
+    <circle cx="100" cy="100" r="86" fill="url(#sphere)" stroke="#b0549e" stroke-opacity="0.35" />
+    <!-- latitudes -->
+    {[26, 52, 0, -52, -26].map((o) => (
+      <ellipse cx="100" cy={100 + o} rx="86" ry={Math.max(6, 86 - Math.abs(o) * 1.15)}
+        fill="none" stroke="#b0549e" stroke-opacity="0.22" />
+    ))}
+    <!-- longitudes (animated) -->
+    <g fill="none" stroke="#5f4c9f" stroke-opacity="0.4">
+      {lons.map((i) => (
+        <ellipse class="ziny-lon" cx="100" cy="100" rx="86" ry="86"
+          style={`animation-delay:${(-i * 1.4).toFixed(2)}s`} />
+      ))}
+    </g>
+  </svg>
+</div>
+
+<style>
+  .ziny-glow {
+    background: radial-gradient(circle, rgba(176, 84, 158, 0.45), transparent 70%);
+    filter: blur(28px);
+  }
+  .ziny-lon {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ziny-spin 8.4s linear infinite;
+  }
+  @keyframes ziny-spin {
+    0%   { rx: 86px; }
+    50%  { rx: 4px;  }
+    100% { rx: 86px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ziny-lon { animation: none; }
+  }
+</style>

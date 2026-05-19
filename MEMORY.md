@@ -87,6 +87,10 @@ Footer
 - Star/rating accent: #F37820 (orange)
 - Heading sizes: h1 60px / h2 50px / h3 20px / h4 18px (desktop)
 - Plan: self-host Prompt + Roboto via @fontsource (speed = project goal)
+- Globe: lightweight CSS/SVG globe w/ minimal animation (NOT D3, NOT fully
+  static) — Val decision 2026-05-18; keeps vibe, kills D3 weight
+- Preview/sign-off flow: Val reviews on web.ziny.io at checkpoints (Claude
+  repackages zip, Val uploads via File Manager). Val does NOT run dev locally.
 
 ## URL Preservation Rules (CRITICAL)
 - Blog: /best-pirate-bay-proxy/ → must stay exactly /best-pirate-bay-proxy/

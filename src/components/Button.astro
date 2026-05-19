@@ -1,0 +1,26 @@
+---
+/** Brand button rendered as a link (all CTAs go to dashboard/anchors). */
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'md' | 'lg';
+  class?: string;
+  external?: boolean;
+}
+const { href, variant = 'primary', size = 'md', class: cls = '', external } = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center rounded-md font-body font-medium transition-colors duration-150 whitespace-nowrap';
+const sizes = { md: 'px-6 py-3 text-sm', lg: 'px-8 py-4 text-base' };
+const variants = {
+  primary: 'bg-brand text-white hover:bg-brand-dark',
+  secondary: 'bg-purple text-white hover:opacity-90',
+  ghost: 'border border-white/25 text-white hover:border-brand hover:text-brand',
+};
+const rel = external ? 'noopener noreferrer' : undefined;
+const target = external ? '_blank' : undefined;
+---
+
+<a href={href} target={target} rel={rel} class:list={[base, sizes[size], variants[variant], cls]}>
+  <slot />
+</a>
