@@ -17,16 +17,17 @@
 **PHASE 1 COMPLETE ✅ — pipeline proven end-to-end on web.ziny.io**
 
 ## Phase 2: Design System (Week 1)
-- [ ] Extract color palette from ziny.io (pinks, purples, blacks)
-- [ ] Identify fonts in use
-- [ ] Build reusable components:
-  - [ ] Button (primary/secondary)
-  - [ ] Pricing card
-  - [ ] Customer review card
-  - [ ] Location card
-  - [ ] Globe graphic (static image, not animated D3)
-  - [ ] Header / Footer
-  - [ ] Logo carousel
+- [x] Extract color palette from ziny.io (pinks, purples, blacks)
+- [x] Identify fonts in use (Prompt headings, Roboto body)
+- [x] Build reusable components:
+  - [x] Button (primary/secondary/ghost)
+  - [x] Pricing card
+  - [x] Customer review card
+  - [x] Location card
+  - [x] Globe graphic (lightweight CSS/SVG, not D3 — Val chose minimal anim)
+  - [x] Header / Footer
+  - [x] Logo carousel
+- [ ] Val visual sign-off on web.ziny.io checkpoint
 
 ## Phase 3: Marketing Pages (Week 2-3)
 - [ ] Homepage (hero, pricing tabs, reviews, locations, support, footer)
