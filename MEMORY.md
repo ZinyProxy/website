@@ -42,8 +42,12 @@ Serve all public traffic from a fast static frontend.
 ## Repo & Deploy
 - GitHub: https://github.com/ZinyProxy/website.git (org: ZinyProxy)
 - `main` = Astro source (staging). Pushed 2026-05-18.
-- Deploy pattern A: `npm run deploy` builds + publishes orphan `deploy` branch
-  (dist/ + .cpanel.yml) -> cPanel Git Version Control pulls -> copies to docroot
+- Deploy: `npm run deploy` builds + commits `dist/` ON `main` (dist/ is tracked,
+  NOT gitignored) + pushes. cPanel Git VC only clones/tracks `main` and its
+  branch dropdown won't expose other branches, so the orphan `deploy` branch
+  approach was abandoned 2026-05-18. `.cpanel.yml` (on main) copies dist/. to docroot.
+- Trade-off accepted: build artifacts live in `main` history (pragmatic for
+  cPanel's single-branch Git VC + non-dev operator).
 - Testing URL: web.ziny.io
 - cPanel user: eabuiltc | docroot: /home/eabuiltc/web.ziny.io/
 - Deploy: `npm run deploy`, then cPanel Git VC: Update from Remote -> Deploy HEAD

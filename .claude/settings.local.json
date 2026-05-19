@@ -35,7 +35,8 @@
       "Bash(timeout 15 openssl s_client -connect web.ziny.io:443 -servername web.ziny.io)",
       "Bash(openssl x509 *)",
       "Bash(git worktree *)",
-      "Bash(git branch *)"
+      "Bash(git branch *)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Switch deploy strategy: dist tracked on main \\(cPanel single-branch constraint\\)\")"
     ]
   }
 }
