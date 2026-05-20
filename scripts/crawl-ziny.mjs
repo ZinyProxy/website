@@ -61,7 +61,8 @@ for (const [i, url] of urls.entries()) {
 
   try {
     const pageD = await ctxDesktop.newPage();
-    await pageD.goto(url, { waitUntil: 'networkidle', timeout: 35000 });
+    await pageD.goto(url, { waitUntil: 'load', timeout: 60000 });
+    await pageD.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
     // Allow late animations (globe etc.) one tick to render before snapshot.
     await pageD.waitForTimeout(800);
     await pageD.screenshot({ path: join(dir, 'desktop.png'), fullPage: true });
@@ -79,7 +80,8 @@ for (const [i, url] of urls.entries()) {
     await pageD.close();
 
     const pageM = await ctxMobile.newPage();
-    await pageM.goto(url, { waitUntil: 'networkidle', timeout: 35000 });
+    await pageM.goto(url, { waitUntil: 'load', timeout: 60000 });
+    await pageM.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
     await pageM.waitForTimeout(600);
     await pageM.screenshot({ path: join(dir, 'mobile.png'), fullPage: true });
     await pageM.close();

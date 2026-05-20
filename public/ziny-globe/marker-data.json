@@ -1,0 +1,22 @@
+[
+  { "name": "New York", "longitude": -74.006, "latitude": 40.7128 },
+  { "name": "London", "longitude": -0.1278, "latitude": 51.5074 },
+  { "name": "Tokyo", "longitude": 139.6917, "latitude": 35.6895 },
+  { "name": "Sydney", "longitude": 151.2093, "latitude": -33.8688 },
+  { "name": "Paris", "longitude": 2.3522, "latitude": 48.8566 },
+  { "name": "Beijing", "longitude": 116.4074, "latitude": 39.9042 },
+  { "name": "Moscow", "longitude": 37.6173, "latitude": 55.7558 },
+  { "name": "Rio de Janeiro", "longitude": -43.1729, "latitude": -22.9068 },
+  { "name": "Los Angeles", "longitude": -118.2437, "latitude": 34.0522 },
+  { "name": "Dubai", "longitude": 55.2708, "latitude": 25.2048 },
+  { "name": "Singapore", "longitude": 103.8198, "latitude": 1.3521 },
+  { "name": "Mumbai", "longitude": 72.8777, "latitude": 19.076 },
+  { "name": "Cairo", "longitude": 31.2357, "latitude": 30.0444 },
+  { "name": "Mexico City", "longitude": -99.1332, "latitude": 19.4326 },
+  { "name": "Berlin", "longitude": 13.405, "latitude": 52.52 },
+  { "name": "Istanbul", "longitude": 28.9784, "latitude": 41.0082 },
+  { "name": "Toronto", "longitude": -79.3832, "latitude": 43.6532 },
+  { "name": "Bangkok", "longitude": 100.5018, "latitude": 13.7563 },
+  { "name": "Johannesburg", "longitude": 28.0473, "latitude": -26.2041 },
+  { "name": "San Francisco", "longitude": -122.4194, "latitude": 37.7749 }
+]

@@ -55,7 +55,13 @@
       "Bash(node scripts/crawl-ziny.mjs --only home)",
       "Bash(node scripts/crawl-ziny.mjs)",
       "Bash(echo \"background PID: $!\")",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Homepage v2: rendered DOM + ALL 32 external CSS inlined + 131 assets mirrored\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Homepage v2: rendered DOM + ALL 32 external CSS inlined + 131 assets mirrored\")",
+      "Bash(xargs -I{} sh -c 'test -f \"reference/pages/{}/desktop.png\" || echo missing-desktop: {}')",
+      "Bash(rm -rf reference/pages/proxy-blog)",
+      "Bash(node -e ' *)",
+      "Bash(node -p \"JSON.parse\\(require\\('fs'\\).readFileSync\\('public/ziny-globe/marker-data.json'\\)\\).length + ' marker locations'\")",
+      "Bash(node scripts/build-all-pages.mjs)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 3: ship all 147 ziny.io pages \\(1:1 captures, dynamic Astro route\\)\")"
     ]
   }
 }

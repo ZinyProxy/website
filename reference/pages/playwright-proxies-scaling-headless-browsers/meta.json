@@ -1,0 +1,19 @@
+{
+  "title": "Playwright & Headless at Scale: Proxy Strategy That Doesn't Collapse After 48 Hours",
+  "description": "Why basic Playwright proxies fail at scale and how residential proxy architecture prevents IP bans, fingerprinting, and scraping downtime.",
+  "h1": [
+    "Scaling Playwright and Headless Without Proxy Failure"
+  ],
+  "h2": [
+    "Why Your Playwright Proxy Setup Dies After 48 Hours",
+    "The Fatal Flaws in Standard Proxy Configurations",
+    "Building a Proxy Architecture That Actually Scales",
+    "Building Production-Ready Playwright Infrastructure",
+    "When to Use Different Proxy Types",
+    "Scaling Beyond DIY: When Infrastructure Becomes the Bottleneck",
+    "The Bottom Line",
+    "Power Your Playwright Operations with Enterprise-Grade Proxies"
+  ],
+  "sections": 0,
+  "images": 16
+}

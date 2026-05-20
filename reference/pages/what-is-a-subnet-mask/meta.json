@@ -1,0 +1,20 @@
+{
+  "title": "What Is a Subnet Mask?",
+  "description": "How Subnet Masks Keep Networks Organized Networks can't run without structure. Every connection relies on a defined route, and every route requires",
+  "h1": [
+    "How Subnet Masks Keep Networks Organized"
+  ],
+  "h2": [
+    "What a Subnet Mask Is",
+    "How Subnet Mask Works",
+    "Subnetting and Mask Sizes",
+    "Why Subnet Masks Matter",
+    "Default Masks and Common Uses",
+    "How to Find Subnet Mask of an IP Address",
+    "Common Problems of Subnet Mask",
+    "Simple Examples of Subnet Mask",
+    "In Conclusion"
+  ],
+  "sections": 0,
+  "images": 18
+}

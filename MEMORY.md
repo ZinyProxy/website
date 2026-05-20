@@ -105,6 +105,28 @@ Footer
   origin/main`. No more zip uploads. (cPanel Git VC *UI* stays unreliable;
   raw git in Terminal is fine.)
 
+## Third-Party Integrations (audited from live homepage 2026-05-20)
+- Chatbot: **Tawk.to** (app `6a065cc0373`) — NOT YourGPT (CLAUDE.md wrong)
+- Twitter ads conversion pixel: static.ads-twitter.com/uwt.js
+- Cloudflare Insights beacon (auto)
+- Prism + clipboard.js + iconify (for code blocks on article pages)
+- Google Tag Manager: literal placeholder `GTM-XXXXXXX` on live site → never
+  configured. Val to provide real GTM/GA4 ID if he wants analytics on rebuild.
+- Trustpilot review widget (linked to /review/ziny.io)
+
+## Globe (D3 spinning globe) — exact asset paths captured
+- World data: /wp-content/plugins/spinning-globe/data/world-110m.json (207KB)
+- Markers: /wp-content/plugins/spinning-globe/data/marker-data.json (1.4KB)
+- Marker pin image: /wp-content/plugins/spinning-globe/assets/img/map.png
+- Config: speed 0.008, verticalTilt -10, horizontalTilt 0; 20 city markers
+  (NY, London, Tokyo, Sydney, Paris, Beijing, Moscow, Rio, LA, Dubai,
+  Singapore, Mumbai, etc.) — all mirrored locally to /public/ziny-globe/
+
+## Corrections to earlier assumptions
+- Blog URL is **/proxy-blog/** (CLAUDE.md / Phase 2 components incorrectly used /blog/ → /blog/ returns 404)
+- Sample 301: /best-pirate-bay-proxy → /best-pirate-bay-proxy/ (trailing slash enforced)
+- Linked-from-homepage but 404 on live: /social-media-proxy/ (dead link on production WP, surface to Val)
+
 ## URL Preservation Rules (CRITICAL)
 - Blog: /best-pirate-bay-proxy/ → must stay exactly /best-pirate-bay-proxy/
 - All 81 article URLs preserved

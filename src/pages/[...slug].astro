@@ -1,0 +1,52 @@
+---
+/**
+ * Renders every captured ziny.io page at its original URL.
+ * Source: src/captured/<slug>.{body.html, styles.css}  (produced by
+ * scripts/build-all-pages.mjs from a Playwright crawl of the live site).
+ *
+ * Trailing slashes are preserved by Astro's site-wide config
+ * (`trailingSlash: 'always'`, `build.format: 'directory'`).
+ */
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+
+export async function getStaticPaths() {
+  const dir = 'src/captured';
+  const slugs = readdirSync(dir)
+    .filter((f) => f.endsWith('.body.html'))
+    .map((f) => f.replace(/\.body\.html$/, ''))
+    .filter((s) => s !== 'home'); // root is served by src/pages/index.astro
+
+  return slugs.map((slug) => ({
+    // Capture script uses '__' to flatten WordPress slashes into a directory
+    // name. Reverse that here so `category__guide` -> `/category/guide/`.
+    params: { slug: slug.replace(/__/g, '/') },
+  }));
+}
+
+const { slug } = Astro.params;
+const file = slug.replace(/\//g, '__');
+const body = readFileSync(join('src/captured', `${file}.body.html`), 'utf8');
+const css = readFileSync(join('src/captured', `${file}.styles.css`), 'utf8');
+
+// Real title/description from the Playwright crawl meta (falls back gracefully).
+let title = `${slug} | Ziny.io`, description = '';
+try {
+  const meta = JSON.parse(readFileSync(join('reference/pages', file, 'meta.json'), 'utf8'));
+  if (meta.title) title = meta.title;
+  if (meta.description) description = meta.description;
+} catch {}
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <style is:inline set:html={css}></style>
+  </head>
+  <body set:html={body}></body>
+</html>
