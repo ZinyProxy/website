@@ -99,6 +99,11 @@ Footer
   re-create JS-driven motion (globe spin, swiper carousels, scroll anims) with
   CSS/light JS. Replace CTAs w/ dashboard links. WP/blog/SEO = later phase.
 - My earlier Phase 2 guessed-content homepage was WRONG (not faithful) — scrapped.
+- 2026-05-20 MILESTONE: all 147 captured pages live on https://web.ziny.io,
+  Val confirmed "EXACTLY 1 TO 1 1000%". Mandate: "just copy paste the current
+  website that is done on Elementor and change it to Astro." No bespoke
+  redesign. Static visual parity = nailed. Remaining = restore JS-driven
+  interactions (globe spin, carousels, tabs, mobile menu, chatbot) and SEO.
 - Preview/sign-off flow: Val reviews on web.ziny.io. DEPLOY = git-pull on cPanel
   Terminal (Val's preferred, organized): docroot -> repo/dist; Claude pushes,
   Val runs `cd ~/repositories/website && git fetch origin && git reset --hard

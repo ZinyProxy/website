@@ -29,16 +29,23 @@
   - [x] Logo carousel
 - [ ] Val visual sign-off on web.ziny.io checkpoint
 
-## Phase 3: Marketing Pages (Week 2-3)
-- [ ] Homepage (hero, pricing tabs, reviews, locations, support, footer)
-- [ ] Residential Proxy landing page
-- [ ] Mobile Proxy landing page
-- [ ] ISP Proxy landing page
-- [ ] Datacenter Proxy landing page
-- [ ] Use Cases pages (web scraping, social media, ad verification, etc.)
-- [ ] Features pages
-- [ ] About / Contact / Pricing / FAQ
-- [ ] Terms / Privacy
+## Phase 3: Marketing Pages (Week 2-3) — DONE 2026-05-20
+Approach pivoted from bespoke components → 1:1 Playwright capture + replay.
+- [x] Crawl all 147 unique ziny.io URLs (desktop + mobile + post-JS DOM)
+- [x] Generalized build-all-pages.mjs (inlines all external CSS per page, mirrors assets)
+- [x] Dynamic [...slug].astro route + index.astro for root
+- [x] All 147 pages live on https://web.ziny.io at original URLs
+- [x] Val visual 1:1 sign-off: "EXACTLY 1 TO 1 1000%"
+
+## Phase 3.5: Restore JS-driven interactions (NEW — needed for functional parity)
+- [ ] Globe: D3 orthographic spin + 20 city markers (assets already mirrored)
+- [ ] Swiper carousels (reviews / logo strip / etc.)
+- [ ] Pricing tabs (Residential/Mobile/ISP/Datacenter switching)
+- [ ] FAQ accordion (if not pure CSS)
+- [ ] Mobile menu toggle
+- [ ] Sticky header behavior on scroll
+- [ ] Tawk.to chatbot script tag
+- [ ] Code blocks (Prism + clipboard) on blog posts
 
 ## Phase 4: Blog Pipeline (Week 4)
 - [ ] Blog index page (lists all posts from WP API)
