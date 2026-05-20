@@ -19,6 +19,9 @@ const body = readFileSync('src/captured/home.body.html', 'utf8');
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <style is:inline set:html={css}></style>
+    <script>
+      import '../scripts/interactions.ts';
+    </script>
   </head>
   <body set:html={body}></body>
 </html>

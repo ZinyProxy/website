@@ -47,6 +47,11 @@ try {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <style is:inline set:html={css}></style>
+    <script>
+      // Restores globe spin, carousels, tabs, accordion, mobile menu, sticky
+      // header, and Tawk.to chatbot on the captured Elementor markup.
+      import '../scripts/interactions.ts';
+    </script>
   </head>
   <body set:html={body}></body>
 </html>
