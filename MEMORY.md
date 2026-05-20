@@ -87,10 +87,23 @@ Footer
 - Star/rating accent: #F37820 (orange)
 - Heading sizes: h1 60px / h2 50px / h3 20px / h4 18px (desktop)
 - Plan: self-host Prompt + Roboto via @fontsource (speed = project goal)
-- Globe: lightweight CSS/SVG globe w/ minimal animation (NOT D3, NOT fully
-  static) — Val decision 2026-05-18; keeps vibe, kills D3 weight
-- Preview/sign-off flow: Val reviews on web.ziny.io at checkpoints (Claude
-  repackages zip, Val uploads via File Manager). Val does NOT run dev locally.
+- FIDELITY MANDATE (Val, 2026-05-19): the rebuild must be a PIXEL-IDENTICAL
+  1:1 copy of current ziny.io — every color, spacing, layout AND animation
+  must look/move exactly the same. BUT re-implemented cleanly (CSS / light JS),
+  NOT a literal mirror. Drop D3/Lottie/Swiper/28-JS bloat; reproduce the same
+  visual motion efficiently. Look = identical; performance = fast (44 -> 90+).
+  This SUPERSEDES the earlier "lightweight/minimal globe" decision — the globe
+  must visually spin like the original, just not via D3.
+- Method: capture live pages' exact rendered HTML + inline CSS (Elementor uses
+  100% inline CSS, 0 external — source of truth), self-host all assets,
+  re-create JS-driven motion (globe spin, swiper carousels, scroll anims) with
+  CSS/light JS. Replace CTAs w/ dashboard links. WP/blog/SEO = later phase.
+- My earlier Phase 2 guessed-content homepage was WRONG (not faithful) — scrapped.
+- Preview/sign-off flow: Val reviews on web.ziny.io. DEPLOY = git-pull on cPanel
+  Terminal (Val's preferred, organized): docroot -> repo/dist; Claude pushes,
+  Val runs `cd ~/repositories/website && git fetch origin && git reset --hard
+  origin/main`. No more zip uploads. (cPanel Git VC *UI* stays unreliable;
+  raw git in Terminal is fine.)
 
 ## URL Preservation Rules (CRITICAL)
 - Blog: /best-pirate-bay-proxy/ → must stay exactly /best-pirate-bay-proxy/

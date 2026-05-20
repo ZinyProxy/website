@@ -46,7 +46,10 @@
       "Bash(grep -oiE '<h[12][^>]*>[^<]{4,90}' /tmp/z.html)",
       "Bash(grep -oiE '<a [^>]*href=\"https://ziny.io/[a-z-]*/?\"[^>]*>[^<]{2,40}</a>' /tmp/z.html)",
       "Bash(grep -oiE 'Clean &amp; Private[^<]*|Unrestricted Proxies[^<]*|#1[^<]{0,40}' /tmp/z.html)",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 2: component library + composed homepage; mark plan\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 2: component library + composed homepage; mark plan\")",
+      "Bash(python3 -c \"import re,sys;h=open\\('z.html',encoding='utf-8',errors='ignore'\\).read\\(\\);s=re.findall\\(r'<style[^>]*>\\(.*?\\)</style>',h,re.S\\);print\\('inline CSS bytes:',sum\\(len\\(x\\) for x in s\\)\\)\")",
+      "Bash(node scripts/build-home.mjs)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Pixel-exact homepage from live ziny.io capture: real CSS+markup, self-hosted assets, JS stripped \\(motion to follow\\)\")"
     ]
   }
 }
