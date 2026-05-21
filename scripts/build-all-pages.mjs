@@ -98,14 +98,26 @@ for (const slug of slugs) {
   let styles = rewriteUrls([...ext, inlineCss].join('\n'));
 
   // Body: strip scripts/preloads, un-lazy imgs+sources, rewrite urls
-  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/);
+  const bodyMatch = html.match(/<body([^>]*)>([\s\S]*?)<\/body>/);
   if (!bodyMatch) { console.warn(`! no body in ${slug}`); continue; }
-  let body = bodyMatch[1]
+
+  // CRITICAL: keep the <body> class attr. Elementor scopes its global colors,
+  // typography AND the dark page background to `.elementor-kit-N` (+ page-id-*).
+  // Without these classes the page renders white with fallback fonts.
+  const bodyClass = bodyMatch[1].match(/class="([^"]*)"/i)?.[1] ?? '';
+
+  let body = bodyMatch[2]
     .replace(/<script[\s\S]*?<\/script>/g, '')
     .replace(/<noscript[\s\S]*?<\/noscript>/g, '')
     .replace(/<link[^>]+rel=["']preload["'][^>]*>/g, '')
     .replace(/<(img|source)\b[^>]*>/gi, unlazy);
   body = rewriteUrls(body);
+
+  // Internal links -> root-relative so they stay on the new site (not live ziny.io).
+  // Leaves dashboard.ziny.io and other subdomains/externals untouched.
+  body = body
+    .replace(/((?:href|action)=")https?:\/\/ziny\.io\//gi, '$1/')
+    .replace(/((?:href|action)=")\/\/ziny\.io\//gi, '$1/');
 
   // Mirror referenced assets
   const assets = new Map();
@@ -114,6 +126,7 @@ for (const slug of slugs) {
 
   writeFileSync(join(OUT_DIR, `${slug}.styles.css`), styles);
   writeFileSync(join(OUT_DIR, `${slug}.body.html`), body);
+  writeFileSync(join(OUT_DIR, `${slug}.bodyclass.txt`), bodyClass);
   if (++done % 20 === 0) console.log(`  ${done}/${slugs.length}…`);
 }
 console.log(`✓ ${done} pages, ${cssCache.size} CSS cached, ${fetchedAssets.size} assets`);

@@ -28,6 +28,8 @@ const { slug } = Astro.params;
 const file = slug.replace(/\//g, '__');
 const body = readFileSync(join('src/captured', `${file}.body.html`), 'utf8');
 const css = readFileSync(join('src/captured', `${file}.styles.css`), 'utf8');
+let bodyClass = '';
+try { bodyClass = readFileSync(join('src/captured', `${file}.bodyclass.txt`), 'utf8'); } catch {}
 
 // Real title/description from the Playwright crawl meta (falls back gracefully).
 let title = `${slug} | Ziny.io`, description = '';
@@ -53,5 +55,5 @@ try {
       import '../scripts/interactions.ts';
     </script>
   </head>
-  <body set:html={body}></body>
+  <body class={bodyClass} set:html={body}></body>
 </html>

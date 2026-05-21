@@ -191,6 +191,45 @@ function initTabs() {
 }
 
 // ============================================================================
+// Mega menu (Elementor nested-menu "e-n-menu") — open dropdown panels on
+// hover (desktop) / click. Panels are `.e-n-menu-content`, toggled via the
+// `.e-n-menu-dropdown-icon` button's aria-controls + aria-expanded.
+// ============================================================================
+function initMegaMenu() {
+  const items = document.querySelectorAll<HTMLElement>('.e-n-menu-item');
+  if (!items.length) return;
+  const isDesktop = () => window.matchMedia('(min-width: 1025px)').matches;
+
+  items.forEach((item) => {
+    const content = item.querySelector<HTMLElement>('.e-n-menu-content');
+    const icon = item.querySelector<HTMLElement>('.e-n-menu-dropdown-icon');
+    const title = item.querySelector<HTMLElement>('.e-n-menu-title');
+    if (!content) return;
+
+    const open = (on: boolean) => {
+      content.style.opacity = on ? '1' : '';
+      content.style.visibility = on ? 'visible' : '';
+      content.style.pointerEvents = on ? 'auto' : '';
+      content.classList.toggle('e-active', on);
+      title?.classList.toggle('e-active', on);
+      icon?.setAttribute('aria-expanded', String(on));
+    };
+
+    // Desktop: hover the whole item.
+    item.addEventListener('mouseenter', () => { if (isDesktop()) open(true); });
+    item.addEventListener('mouseleave', () => { if (isDesktop()) open(false); });
+    // Touch / click on the icon (or title) toggles.
+    [icon, title].forEach((trigger) =>
+      trigger?.addEventListener('click', (e) => {
+        if (isDesktop()) return;
+        e.preventDefault();
+        open(icon?.getAttribute('aria-expanded') !== 'true');
+      }),
+    );
+  });
+}
+
+// ============================================================================
 // Tawk.to chatbot — exact embed from live ziny.io
 // ============================================================================
 function initChatbot() {
@@ -210,6 +249,7 @@ function initChatbot() {
 function boot() {
   initGlobe().catch((e) => console.warn('globe init failed', e));
   initMobileMenu();
+  initMegaMenu();
   // initStickyHeader();  // disabled — Elementor sticky needs a clean re-impl; revisit
   initAccordion();
   initTabs();
