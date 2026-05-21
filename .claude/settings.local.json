@@ -69,7 +69,8 @@
       "Bash(node scripts/build-all-pages.mjs --only home)",
       "Bash(echo \"malformed /ziny//ziny paths:\")",
       "Bash(grep -oE '/ziny//' src/captured/home.body.html)",
-      "Bash(grep -oE '/ziny//|/ziny/ziny/' dist/index.html)"
+      "Bash(grep -oE '/ziny//|/ziny/ziny/' dist/index.html)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Include 357 late-mirrored images for inner/blog pages\")"
     ]
   }
 }
