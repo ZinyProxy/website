@@ -1,0 +1,20 @@
+.globe-container svg {
+  display: block;
+	transform: scale(1.2);
+}
+.graticule {
+  fill: none;
+  /*   stroke: #ccc; */
+  /*   stroke-width: 0.5px; */
+}
+.land {
+  fill: #b0549e;
+  /*   stroke: #000; */
+  /*   stroke-width: 0.2px; */
+}
+.marker {
+  fill: #000;
+}
+.sphere {
+  fill: #5e4c9f !important;
+}

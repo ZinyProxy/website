@@ -11,6 +11,8 @@ let bodyClass = '';
 try { bodyClass = readFileSync('src/captured/home.bodyclass.txt', 'utf8'); } catch {}
 let scripts: { src?: string; code?: string }[] = [];
 try { scripts = JSON.parse(readFileSync('src/captured/home.scripts.json', 'utf8')); } catch {}
+let cssLinks: string[] = [];
+try { cssLinks = JSON.parse(readFileSync('src/captured/home.links.json', 'utf8')); } catch {}
 ---
 <!doctype html>
 <html lang="en">
@@ -21,6 +23,7 @@ try { scripts = JSON.parse(readFileSync('src/captured/home.scripts.json', 'utf8'
     <meta name="description" content="Ziny Proxy offers over 30 million IPs across 195 countries. Unrestricted & Unlimited residential proxy, mobile proxy, and datacenter IPs." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    {cssLinks.map((href) => <link rel="stylesheet" href={href} />)}
     <style is:inline set:html={css}></style>
   </head>
   <body class={bodyClass}>

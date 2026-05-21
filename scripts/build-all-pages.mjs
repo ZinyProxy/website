@@ -13,14 +13,17 @@
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const RAW_DIR = 'reference/raw';
 const OUT_DIR = 'src/captured';
 const ASSET_DIR = 'public/ziny';
 const FONT_DIR = 'public/ziny-fonts';
+const CSS_DIR = 'public/ziny-css';
 mkdirSync(OUT_DIR, { recursive: true });
 mkdirSync(ASSET_DIR, { recursive: true });
 mkdirSync(FONT_DIR, { recursive: true });
+mkdirSync(CSS_DIR, { recursive: true });
 
 const only = (() => { const i = process.argv.indexOf('--only'); return i >= 0 ? new Set(process.argv[i + 1].split(',')) : null; })();
 const slugs = readdirSync(RAW_DIR)
@@ -105,24 +108,68 @@ async function fetchCss(url) {
   return css;
 }
 
+// Each external stylesheet is written ONCE to public/ziny-css/ and linked from
+// every page — so the shared ~150KB Elementor CSS is downloaded once and
+// browser-cached across all 147 pages (was inlined into every page = 393MB dist).
+const sharedCss = new Map(); // url -> /ziny-css/<name>
+async function ensureSharedCss(url) {
+  if (sharedCss.has(url)) return sharedCss.get(url);
+  let css = await fetchCss(url);
+  if (!css) { sharedCss.set(url, null); return null; }
+  const f = new Map();
+  collectFonts(css, f);
+  for (const [file, furl] of f) await mirror(file, furl, FONT_DIR);
+  css = localizeFonts(rewriteUrls(css));
+  const name = url.replace(/^https?:\/\//, '').replace(/\?.*$/, '').replace(/[^a-zA-Z0-9.]+/g, '_');
+  writeFileSync(join(CSS_DIR, name), css);
+  const href = `/ziny-css/${name}`;
+  sharedCss.set(url, href);
+  return href;
+}
+
+// --- Pre-pass: find inline <style> blocks repeated across many pages and
+//     dedupe them into one cached file (header/footer templates, fonts, kit). --
+const allRaw = readdirSync(RAW_DIR).filter((f) => f.endsWith('.html'));
+const blkCount = new Map(); const blkContent = new Map(); const blkOrder = [];
+const md5 = (s) => createHash('md5').update(s).digest('hex');
+for (const f of allRaw) {
+  const h = readFileSync(join(RAW_DIR, f), 'utf8');
+  for (const m of h.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+    const hash = md5(m[1]);
+    if (!blkCount.has(hash)) { blkCount.set(hash, 0); blkContent.set(hash, m[1]); blkOrder.push(hash); }
+    blkCount.set(hash, blkCount.get(hash) + 1);
+  }
+}
+const SHARE_T = Math.ceil(allRaw.length * 0.5);
+const sharedHashes = new Set(blkOrder.filter((h) => blkCount.get(h) >= SHARE_T));
+const sharedInlineHref = '/ziny-css/_inline-shared.css';
+{
+  const sharedInline = blkOrder.filter((h) => sharedHashes.has(h)).map((h) => blkContent.get(h)).join('\n');
+  const f = new Map(); collectFonts(sharedInline, f);
+  for (const [file, url] of f) await mirror(file, url, FONT_DIR);
+  writeFileSync(join(CSS_DIR, '_inline-shared.css'), localizeFonts(rewriteUrls(sharedInline)));
+  console.log(`shared inline: ${sharedHashes.size} blocks deduped`);
+}
+
 let done = 0;
 for (const slug of slugs) {
   const html = readFileSync(join(RAW_DIR, `${slug}.html`), 'utf8');
 
-  // CSS: external (cached) + inline blocks
+  // External CSS -> shared cached <link>s (written once). Page-specific inline
+  // <style> blocks stay inlined (small, unique per page).
   const cssUrls = (html.match(/<link[^>]+rel=["']stylesheet["'][^>]*>/gi) ?? [])
     .map((t) => t.match(/href=["']([^"']+)["']/i)?.[1]).filter((u) => u && /^https?:\/\//i.test(u));
-  const ext = [];
-  for (const u of cssUrls) ext.push(await fetchCss(u));
-  const inlineCss = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
-  const combinedCss = [...ext, inlineCss].join('\n');
+  const links = [];
+  for (const u of cssUrls) { const href = await ensureSharedCss(u); if (href) links.push(href); }
+  links.push(sharedInlineHref); // common inline blocks, cached once
 
-  // Self-host plugin/theme webfonts (CORS-safe) before rewriting their URLs.
+  // Only the page-UNIQUE inline blocks stay inline; shared ones are linked above.
+  const inlineCss = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
+    .map((m) => m[1]).filter((c) => !sharedHashes.has(md5(c))).join('\n');
   const fonts = new Map();
-  collectFonts(combinedCss, fonts);
+  collectFonts(inlineCss, fonts);
   for (const [file, url] of fonts) await mirror(file, url, FONT_DIR);
-
-  let styles = localizeFonts(rewriteUrls(combinedCss));
+  let styles = localizeFonts(rewriteUrls(inlineCss));
 
   // Extract ALL scripts (head + body) IN ORDER so we can re-emit them as real,
   // executing <script> tags. This keeps Elementor's own JS (jQuery, frontend,
@@ -186,6 +233,7 @@ for (const slug of slugs) {
   writeFileSync(join(OUT_DIR, `${slug}.body.html`), body);
   writeFileSync(join(OUT_DIR, `${slug}.bodyclass.txt`), bodyClass);
   writeFileSync(join(OUT_DIR, `${slug}.scripts.json`), JSON.stringify(scripts));
+  writeFileSync(join(OUT_DIR, `${slug}.links.json`), JSON.stringify(links));
   if (++done % 20 === 0) console.log(`  ${done}/${slugs.length}…`);
 }
 console.log(`✓ ${done} pages, ${cssCache.size} CSS cached, ${fetchedAssets.size} assets`);

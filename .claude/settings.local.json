@@ -75,7 +75,11 @@
       "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Fix fonts \\(gstatic CDN\\) + self-host FA/eicons icons + root-relative upload images\")",
       "Bash(grep -oE '.{0,200}balance-page\\\\.svg.{0,80}' src/captured/home.body.html)",
       "Bash(node -e \"const s=require\\('./src/captured/home.scripts.json'\\); console.log\\('total:',s.length\\); console.log\\('external:',s.filter\\(x=>x.src\\).length,'inline:',s.filter\\(x=>x.code\\).length\\); console.log\\(s.filter\\(x=>x.src\\).map\\(x=>x.src.split\\('/'\\).pop\\(\\).split\\('?'\\)[0]\\).slice\\(0,25\\).join\\('\\\\n'\\)\\)\")",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Preserve original Elementor JS sitewide: exact dropdowns, globe, dashboard, tabs, code blocks\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Preserve original Elementor JS sitewide: exact dropdowns, globe, dashboard, tabs, code blocks\")",
+      "Bash(awk '{print $5\" bytes home CSS\"}')",
+      "Bash(awk '{print $1\" bytes\"}')",
+      "Bash(awk '{print int\\($1/1024\\)\" KB\"}')",
+      "Bash(awk '{print int\\($1/1024\\)\" KB \"$2}')"
     ]
   }
 }

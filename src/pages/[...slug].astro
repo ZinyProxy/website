@@ -31,6 +31,8 @@ let bodyClass = '';
 try { bodyClass = readFileSync(join('src/captured', `${file}.bodyclass.txt`), 'utf8'); } catch {}
 let scripts: { src?: string; code?: string }[] = [];
 try { scripts = JSON.parse(readFileSync(join('src/captured', `${file}.scripts.json`), 'utf8')); } catch {}
+let cssLinks: string[] = [];
+try { cssLinks = JSON.parse(readFileSync(join('src/captured', `${file}.links.json`), 'utf8')); } catch {}
 
 let title = `${slug} | Ziny.io`, description = '';
 try {
@@ -48,6 +50,7 @@ try {
     {description && <meta name="description" content={description} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    {cssLinks.map((href) => <link rel="stylesheet" href={href} />)}
     <style is:inline set:html={css}></style>
   </head>
   <body class={bodyClass}>
