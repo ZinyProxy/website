@@ -1,11 +1,12 @@
 ---
 /**
  * Renders every captured ziny.io page at its original URL.
- * Source: src/captured/<slug>.{body.html, styles.css}  (produced by
- * scripts/build-all-pages.mjs from a Playwright crawl of the live site).
+ * Source: src/captured/<slug>.{body.html, styles.css, bodyclass.txt, scripts.json}
+ * (produced by scripts/build-all-pages.mjs from the live site).
  *
- * Trailing slashes are preserved by Astro's site-wide config
- * (`trailingSlash: 'always'`, `build.format: 'directory'`).
+ * Scripts are re-emitted as real, executing <script> tags so Elementor's own
+ * JS (nested menu/tabs, swiper, sticky, the D3 globe, dashboard motion) runs
+ * exactly like the live site. Trailing slashes preserved by astro.config.
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -18,8 +19,6 @@ export async function getStaticPaths() {
     .filter((s) => s !== 'home'); // root is served by src/pages/index.astro
 
   return slugs.map((slug) => ({
-    // Capture script uses '__' to flatten WordPress slashes into a directory
-    // name. Reverse that here so `category__guide` -> `/category/guide/`.
     params: { slug: slug.replace(/__/g, '/') },
   }));
 }
@@ -30,8 +29,9 @@ const body = readFileSync(join('src/captured', `${file}.body.html`), 'utf8');
 const css = readFileSync(join('src/captured', `${file}.styles.css`), 'utf8');
 let bodyClass = '';
 try { bodyClass = readFileSync(join('src/captured', `${file}.bodyclass.txt`), 'utf8'); } catch {}
+let scripts: { src?: string; code?: string }[] = [];
+try { scripts = JSON.parse(readFileSync(join('src/captured', `${file}.scripts.json`), 'utf8')); } catch {}
 
-// Real title/description from the Playwright crawl meta (falls back gracefully).
 let title = `${slug} | Ziny.io`, description = '';
 try {
   const meta = JSON.parse(readFileSync(join('reference/pages', file, 'meta.json'), 'utf8'));
@@ -49,20 +49,11 @@ try {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <style is:inline set:html={css}></style>
-    <script>
-      // Restores globe spin, carousels, tabs, accordion, mobile menu, sticky
-      // header, and Tawk.to chatbot on the captured Elementor markup.
-      import '../scripts/interactions.ts';
-    </script>
-    <!-- Prism syntax highlighting + clipboard + iconify (same as live ziny.io) -->
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-core.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/toolbar/prism-toolbar.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
-    <script is:inline defer src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
   </head>
-  <body class={bodyClass} set:html={body}></body>
+  <body class={bodyClass}>
+    <Fragment set:html={body} />
+    {scripts.map((s) => (s.src
+      ? <script is:inline src={s.src}></script>
+      : <script is:inline set:html={s.code}></script>))}
+  </body>
 </html>

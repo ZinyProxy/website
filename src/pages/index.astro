@@ -1,38 +1,32 @@
 ---
 /**
- * Homepage — pixel-identical to the live ziny.io.
- * Markup + CSS come straight from a live capture (see scripts/build-home.mjs).
- * Re-run `node scripts/build-home.mjs` whenever ziny.io changes.
- * Motion (globe / carousels) lives in lightweight modules added separately.
+ * Homepage — 1:1 with live ziny.io. Markup + CSS + original scripts from a
+ * live capture (scripts/build-all-pages.mjs). Scripts re-emitted as real tags
+ * so Elementor's own JS runs identically (globe, dropdowns, dashboard, swiper).
  */
 import { readFileSync } from 'node:fs';
 const css = readFileSync('src/captured/home.styles.css', 'utf8');
 const body = readFileSync('src/captured/home.body.html', 'utf8');
 let bodyClass = '';
 try { bodyClass = readFileSync('src/captured/home.bodyclass.txt', 'utf8'); } catch {}
+let scripts: { src?: string; code?: string }[] = [];
+try { scripts = JSON.parse(readFileSync('src/captured/home.scripts.json', 'utf8')); } catch {}
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ziny — Clean &amp; Private Proxies, #1 Performance</title>
-    <meta name="description" content="Residential, mobile, ISP and datacenter proxies engineered for the highest success rates." />
+    <title>Ziny Proxy | Buy Clean & Reliable Private Proxy Servers</title>
+    <meta name="description" content="Ziny Proxy offers over 30 million IPs across 195 countries. Unrestricted & Unlimited residential proxy, mobile proxy, and datacenter IPs." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <style is:inline set:html={css}></style>
-    <script>
-      import '../scripts/interactions.ts';
-    </script>
-    <!-- Prism syntax highlighting + clipboard + iconify (same as live ziny.io) -->
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-core.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/toolbar/prism-toolbar.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
-    <script is:inline defer src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
-    <script is:inline defer src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
   </head>
-  <body class={bodyClass} set:html={body}></body>
+  <body class={bodyClass}>
+    <Fragment set:html={body} />
+    {scripts.map((s) => (s.src
+      ? <script is:inline src={s.src}></script>
+      : <script is:inline set:html={s.code}></script>))}
+  </body>
 </html>

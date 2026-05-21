@@ -124,6 +124,37 @@ for (const slug of slugs) {
 
   let styles = localizeFonts(rewriteUrls(combinedCss));
 
+  // Extract ALL scripts (head + body) IN ORDER so we can re-emit them as real,
+  // executing <script> tags. This keeps Elementor's own JS (jQuery, frontend,
+  // nested menu/tabs, swiper, sticky, the D3 globe, dashboard motion) running
+  // EXACTLY like the live site. External src stays absolute (loads from ziny.io);
+  // inline config (elementorFrontendConfig, sgd_plugin_data, …) is preserved.
+  const scripts = [];
+  for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const attrs = m[1];
+    const srcM = attrs.match(/\ssrc=["']([^"']+)["']/i);
+    const typeM = attrs.match(/\stype=["']([^"']+)["']/i);
+    const type = typeM?.[1];
+    // Skip JSON-LD / non-JS data blocks (kept in <head> SEO later, not executed here).
+    if (type && !/javascript|module/i.test(type)) continue;
+    if (srcM) {
+      let src = srcM[1].replace(/^\/\//, 'https://');
+      // WP emoji + GTM placeholder are noisy/no-ops — skip.
+      if (/wp-emoji-release|gtag\/js|googletagmanager/i.test(src)) continue;
+      scripts.push({ src });
+    } else {
+      let code = m[2].trim();
+      if (!code || /wpemoji|gtag\(/i.test(code)) continue;
+      // The D3 globe fetches its data via d3.json() — cross-origin to ziny.io
+      // is CORS-blocked. Point it at our same-origin mirrored copies.
+      code = code
+        .replace(/https?:\\?\/\\?\/ziny\.io\/wp-content\/plugins\/spinning-globe\/data\/world-110m\.json/gi, '/ziny-globe/world-110m.json')
+        .replace(/https?:\\?\/\\?\/ziny\.io\/wp-content\/plugins\/spinning-globe\/data\/marker-data\.json/gi, '/ziny-globe/marker-data.json')
+        .replace(/https?:\\?\/\\?\/ziny\.io\/wp-content\/plugins\/spinning-globe\/assets\/img\/map\.png/gi, '/ziny-globe/map.png');
+      scripts.push({ code });
+    }
+  }
+
   // Body: strip scripts/preloads, un-lazy imgs+sources, rewrite urls
   const bodyMatch = html.match(/<body([^>]*)>([\s\S]*?)<\/body>/);
   if (!bodyMatch) { console.warn(`! no body in ${slug}`); continue; }
@@ -154,6 +185,7 @@ for (const slug of slugs) {
   writeFileSync(join(OUT_DIR, `${slug}.styles.css`), styles);
   writeFileSync(join(OUT_DIR, `${slug}.body.html`), body);
   writeFileSync(join(OUT_DIR, `${slug}.bodyclass.txt`), bodyClass);
+  writeFileSync(join(OUT_DIR, `${slug}.scripts.json`), JSON.stringify(scripts));
   if (++done % 20 === 0) console.log(`  ${done}/${slugs.length}…`);
 }
 console.log(`✓ ${done} pages, ${cssCache.size} CSS cached, ${fetchedAssets.size} assets`);
