@@ -79,7 +79,8 @@
       "Bash(awk '{print $5\" bytes home CSS\"}')",
       "Bash(awk '{print $1\" bytes\"}')",
       "Bash(awk '{print int\\($1/1024\\)\" KB\"}')",
-      "Bash(awk '{print int\\($1/1024\\)\" KB \"$2}')"
+      "Bash(awk '{print int\\($1/1024\\)\" KB \"$2}')",
+      "Bash(grep -oE '.{0,400}View All Locations' reference/raw/home.html)"
     ]
   }
 }
