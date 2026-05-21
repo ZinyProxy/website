@@ -207,12 +207,17 @@ function initMegaMenu() {
     if (!content) return;
 
     const open = (on: boolean) => {
+      // Elementor hides the panel with display:none — force it on.
+      content.style.display = on ? 'flex' : '';
       content.style.opacity = on ? '1' : '';
       content.style.visibility = on ? 'visible' : '';
       content.style.pointerEvents = on ? 'auto' : '';
       content.classList.toggle('e-active', on);
       title?.classList.toggle('e-active', on);
       icon?.setAttribute('aria-expanded', String(on));
+      content.querySelectorAll<HTMLElement>(':scope > .e-con, :scope > *').forEach((c) => {
+        if (on) c.style.display = c.style.display === 'none' ? '' : c.style.display;
+      });
     };
 
     // Desktop: hover the whole item.
