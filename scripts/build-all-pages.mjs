@@ -17,8 +17,10 @@ import { join } from 'node:path';
 const RAW_DIR = 'reference/raw';
 const OUT_DIR = 'src/captured';
 const ASSET_DIR = 'public/ziny';
+const FONT_DIR = 'public/ziny-fonts';
 mkdirSync(OUT_DIR, { recursive: true });
 mkdirSync(ASSET_DIR, { recursive: true });
+mkdirSync(FONT_DIR, { recursive: true });
 
 const only = (() => { const i = process.argv.indexOf('--only'); return i >= 0 ? new Set(process.argv[i + 1].split(',')) : null; })();
 const slugs = readdirSync(RAW_DIR)
@@ -27,22 +29,23 @@ const slugs = readdirSync(RAW_DIR)
   .filter((s) => !only || only.has(s));
 console.log(`processing ${slugs.length} pages…`);
 
-// --- ziny.io upload URL -> /ziny/<basename> (clean) -----------------------
-const ZINY_UPLOAD = /(?:https?:)?\/\/ziny\.io\/wp-content\/uploads\/(?:[^"'\s)]+\/)?([^\/"'\s)?#]+\.(?:png|jpe?g|webp|svg|gif|avif|woff2?|ttf|otf|eot))/gi;
+// --- ziny.io upload URL -> /ziny/<basename> (absolute OR root-relative) ----
+const ZINY_UPLOAD = /(?:(?:https?:)?\/\/ziny\.io)?\/wp-content\/uploads\/(?:[^"'\s)]+\/)?([^\/"'\s)?#]+\.(?:png|jpe?g|webp|svg|gif|avif|woff2?|ttf|otf|eot))/gi;
 const rewriteUrls = (s) => s.replace(ZINY_UPLOAD, (_m, file) => `/ziny/${file}`);
+const toAbs = (u) => u.replace(/^\/\//, 'https://').replace(/^\/wp-content/, 'https://ziny.io/wp-content');
 
 // --- collect upload basenames -> a real URL, for mirroring ----------------
 function collectAssets(s, map) {
   for (const m of s.matchAll(ZINY_UPLOAD)) {
-    const file = m[1];
-    if (!map.has(file)) map.set(file, m[0].replace(/^\/\//, 'https://'));
+    if (!map.has(m[1])) map.set(m[1], toAbs(m[0]));
   }
 }
 const fetchedAssets = new Set();
-async function mirror(file, url) {
-  if (fetchedAssets.has(file)) return;
-  fetchedAssets.add(file);
-  const dest = join(ASSET_DIR, file);
+async function mirror(file, url, dir = ASSET_DIR) {
+  const key = `${dir}/${file}`;
+  if (fetchedAssets.has(key)) return;
+  fetchedAssets.add(key);
+  const dest = join(dir, file);
   if (existsSync(dest)) return;
   try {
     const safe = url.replace(/[^\x00-\x7F]/g, (c) => encodeURIComponent(c));
@@ -50,6 +53,23 @@ async function mirror(file, url) {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     writeFileSync(dest, Buffer.from(await r.arrayBuffer()));
   } catch { /* many srcset variants legitimately 404 on the live site */ }
+}
+
+// --- Fonts/icons ----------------------------------------------------------
+// 1. Google Fonts: ziny.io localizes them under root-relative /fonts.gstatic.com/
+//    which 404s for us -> point to the real Google CDN (serves CORS).
+// 2. Plugin/theme webfonts (Font Awesome, eicons, …) load cross-origin from
+//    ziny.io with NO CORS header -> browser blocks them. Self-host same-origin.
+const ZINY_FONT = /(?:(?:https?:)?\/\/ziny\.io)?\/wp-(?:content|includes)\/[^"'\s)]+?\/([^\/"'\s)?#]+\.(?:woff2?|ttf|eot|otf|svg))(\?[^"'\s)#]*)?(#[^"'\s)]*)?/gi;
+function collectFonts(s, map) {
+  for (const m of s.matchAll(ZINY_FONT)) {
+    if (!map.has(m[1])) map.set(m[1], toAbs(m[0].split('?')[0].split('#')[0]));
+  }
+}
+function localizeFonts(css) {
+  return css
+    .replace(/(['"(])\/?\/?fonts\.gstatic\.com\//g, '$1https://fonts.gstatic.com/')
+    .replace(ZINY_FONT, (_m, file, _q, frag = '') => `/ziny-fonts/${file}${frag || ''}`);
 }
 
 // --- un-lazy a single <img> or <source> tag -------------------------------
@@ -95,7 +115,14 @@ for (const slug of slugs) {
   const ext = [];
   for (const u of cssUrls) ext.push(await fetchCss(u));
   const inlineCss = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
-  let styles = rewriteUrls([...ext, inlineCss].join('\n'));
+  const combinedCss = [...ext, inlineCss].join('\n');
+
+  // Self-host plugin/theme webfonts (CORS-safe) before rewriting their URLs.
+  const fonts = new Map();
+  collectFonts(combinedCss, fonts);
+  for (const [file, url] of fonts) await mirror(file, url, FONT_DIR);
+
+  let styles = localizeFonts(rewriteUrls(combinedCss));
 
   // Body: strip scripts/preloads, un-lazy imgs+sources, rewrite urls
   const bodyMatch = html.match(/<body([^>]*)>([\s\S]*?)<\/body>/);

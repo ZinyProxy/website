@@ -71,7 +71,8 @@
       "Bash(grep -oE '/ziny//' src/captured/home.body.html)",
       "Bash(grep -oE '/ziny//|/ziny/ziny/' dist/index.html)",
       "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Include 357 late-mirrored images for inner/blog pages\")",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Restore body classes \\(dark bg + fonts\\) + relative internal links + mega-menu dropdowns\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Restore body classes \\(dark bg + fonts\\) + relative internal links + mega-menu dropdowns\")",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Fix fonts \\(gstatic CDN\\) + self-host FA/eicons icons + root-relative upload images\")"
     ]
   }
 }
