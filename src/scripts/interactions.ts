@@ -210,7 +210,7 @@ function initChatbot() {
 function boot() {
   initGlobe().catch((e) => console.warn('globe init failed', e));
   initMobileMenu();
-  initStickyHeader();
+  // initStickyHeader();  // disabled — Elementor sticky needs a clean re-impl; revisit
   initAccordion();
   initTabs();
   initChatbot();

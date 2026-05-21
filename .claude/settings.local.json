@@ -64,7 +64,12 @@
       "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 3: ship all 147 ziny.io pages \\(1:1 captures, dynamic Astro route\\)\")",
       "Bash(git rm *)",
       "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Untrack reference/ and src/captured/ \\(local-only; dist/ still serves\\)\")",
-      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 3 sign-off: 1:1 confirmed; map remaining JS-interaction restore as Phase 3.5\")"
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Phase 3 sign-off: 1:1 confirmed; map remaining JS-interaction restore as Phase 3.5\")",
+      "Bash(grep -oE '.{0,80}Scraping & Data Collection.{0,400}' src/captured/home.body.html)",
+      "Bash(node scripts/build-all-pages.mjs --only home)",
+      "Bash(echo \"malformed /ziny//ziny paths:\")",
+      "Bash(grep -oE '/ziny//' src/captured/home.body.html)",
+      "Bash(grep -oE '/ziny//|/ziny/ziny/' dist/index.html)"
     ]
   }
 }
