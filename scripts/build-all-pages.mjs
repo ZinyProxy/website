@@ -186,8 +186,9 @@ for (const slug of slugs) {
     if (type && !/javascript|module/i.test(type)) continue;
     if (srcM) {
       let src = srcM[1].replace(/^\/\//, 'https://');
-      // WP emoji + GTM placeholder are noisy/no-ops — skip.
-      if (/wp-emoji-release|gtag\/js|googletagmanager/i.test(src)) continue;
+      // Skip: WP emoji, GTM placeholder, and Cloudflare email-decode (the
+      // /cdn-cgi/ path 404s on our origin; we decode emails at build time below).
+      if (/wp-emoji-release|gtag\/js|googletagmanager|cdn-cgi|email-decode/i.test(src)) continue;
       scripts.push({ src });
     } else {
       let code = m[2].trim();
@@ -223,6 +224,20 @@ for (const slug of slugs) {
   body = body
     .replace(/((?:href|action)=")https?:\/\/ziny\.io\//gi, '$1/')
     .replace(/((?:href|action)=")\/\/ziny\.io\//gi, '$1/');
+
+  // Decode Cloudflare-obfuscated emails (the /cdn-cgi/ decoder doesn't exist on
+  // our origin). data-cfemail: first hex byte is the XOR key for the rest.
+  const cfDecode = (hex) => {
+    const key = parseInt(hex.slice(0, 2), 16);
+    let out = '';
+    for (let i = 2; i < hex.length; i += 2) out += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16) ^ key);
+    return out;
+  };
+  body = body
+    .replace(/<a\b[^>]*class="[^"]*__cf_email__[^"]*"[^>]*data-cfemail="([0-9a-fA-F]+)"[^>]*>[\s\S]*?<\/a>/gi,
+      (_m, hex) => { const e = cfDecode(hex); return `<a href="mailto:${e}">${e}</a>`; })
+    .replace(/<span\b[^>]*data-cfemail="([0-9a-fA-F]+)"[^>]*>[\s\S]*?<\/span>/gi, (_m, hex) => cfDecode(hex))
+    .replace(/href="\/cdn-cgi\/l\/email-protection[^"]*"/gi, 'href="#"');
 
   // Mirror referenced assets
   const assets = new Map();
