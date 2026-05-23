@@ -127,29 +127,11 @@ async function ensureSharedCss(url) {
   return href;
 }
 
-// --- Pre-pass: find inline <style> blocks repeated across many pages and
-//     dedupe them into one cached file (header/footer templates, fonts, kit). --
-const allRaw = readdirSync(RAW_DIR).filter((f) => f.endsWith('.html'));
-const blkCount = new Map(); const blkContent = new Map(); const blkOrder = [];
-const md5 = (s) => createHash('md5').update(s).digest('hex');
-for (const f of allRaw) {
-  const h = readFileSync(join(RAW_DIR, f), 'utf8');
-  for (const m of h.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
-    const hash = md5(m[1]);
-    if (!blkCount.has(hash)) { blkCount.set(hash, 0); blkContent.set(hash, m[1]); blkOrder.push(hash); }
-    blkCount.set(hash, blkCount.get(hash) + 1);
-  }
-}
-const SHARE_T = Math.ceil(allRaw.length * 0.5);
-const sharedHashes = new Set(blkOrder.filter((h) => blkCount.get(h) >= SHARE_T));
-const sharedInlineHref = '/ziny-css/_inline-shared.css';
-{
-  const sharedInline = blkOrder.filter((h) => sharedHashes.has(h)).map((h) => blkContent.get(h)).join('\n');
-  const f = new Map(); collectFonts(sharedInline, f);
-  for (const [file, url] of f) await mirror(file, url, FONT_DIR);
-  writeFileSync(join(CSS_DIR, '_inline-shared.css'), localizeFonts(rewriteUrls(sharedInline)));
-  console.log(`shared inline: ${sharedHashes.size} blocks deduped`);
-}
+// NOTE: inline <style> blocks are kept ENTIRELY inline per page, in their
+// original document order. Deduping/splitting them reorders the cascade and
+// breaks specificity-dependent rules (e.g. the dashboard sidebar rendered dark
+// instead of light). External stylesheets are still shared (safe — they were
+// already separate <link>s in the original, same order).
 
 let done = 0;
 for (const slug of slugs) {
@@ -161,11 +143,10 @@ for (const slug of slugs) {
     .map((t) => t.match(/href=["']([^"']+)["']/i)?.[1]).filter((u) => u && /^https?:\/\//i.test(u));
   const links = [];
   for (const u of cssUrls) { const href = await ensureSharedCss(u); if (href) links.push(href); }
-  links.push(sharedInlineHref); // common inline blocks, cached once
 
-  // Only the page-UNIQUE inline blocks stay inline; shared ones are linked above.
+  // ALL inline blocks, in original order — preserves the exact cascade.
   const inlineCss = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
-    .map((m) => m[1]).filter((c) => !sharedHashes.has(md5(c))).join('\n');
+    .map((m) => m[1]).join('\n');
   const fonts = new Map();
   collectFonts(inlineCss, fonts);
   for (const [file, url] of fonts) await mirror(file, url, FONT_DIR);

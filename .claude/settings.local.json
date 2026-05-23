@@ -80,7 +80,10 @@
       "Bash(awk '{print $1\" bytes\"}')",
       "Bash(awk '{print int\\($1/1024\\)\" KB\"}')",
       "Bash(awk '{print int\\($1/1024\\)\" KB \"$2}')",
-      "Bash(grep -oE '.{0,400}View All Locations' reference/raw/home.html)"
+      "Bash(grep -oE '.{0,400}View All Locations' reference/raw/home.html)",
+      "Bash(rm -f public/ziny-css/_inline-shared.css)",
+      "Bash(node scripts/build-all-pages.mjs --only proxy-pricing)",
+      "Bash(git -c user.email=\"cosmocheats7@gmail.com\" -c user.name=\"Val\" commit -q -m \"Fix CSS cascade: keep inline styles in original order \\(fixes dashboard sidebar + section backgrounds sitewide\\)\")"
     ]
   }
 }
