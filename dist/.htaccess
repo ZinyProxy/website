@@ -3,6 +3,32 @@
 # Serve the captured 1:1 clone of the live ziny.io 404 page on any missing URL.
 ErrorDocument 404 /404.html
 
+# --- 301 redirects (link-audit findings, see reference/link-audit.json) ---
+# Use RedirectMatch with end-anchors so we don't accidentally redirect URLs
+# that *start with* the same prefix (Apache's `Redirect` matches by prefix).
+<IfModule mod_alias.c>
+  # Match live ziny.io's 301: /pricing[/] → /pricing-for-testing-purposes/
+  RedirectMatch 301 ^/pricing/?$ /pricing-for-testing-purposes/
+
+  # Fix WP content typos that produce 404s in-page (38+14+14+... bad in-page links).
+  # NOTE: live ziny.io also 404s these — fixing them on our build is a *deliberate*
+  # divergence from live, to improve UX. Approved by Val 2026-05-27.
+  RedirectMatch 301 ^/social-media-proxy/?$ /social-media-managment/
+  RedirectMatch 301 ^/market-monitoring/?$ /market-research/
+  RedirectMatch 301 ^/ecommerce-proxis/?$ /ecommerce-proxies/
+  RedirectMatch 301 ^/tinder-proxies/?$ /tinder-proxy/
+  RedirectMatch 301 ^/youyube-proxies/?$ /youtube-proxies/
+  RedirectMatch 301 ^/residential-proxies/?$ /residential-proxy/
+  RedirectMatch 301 ^/roblox-proxy/?$ /unblock-roblox/
+  RedirectMatch 301 ^/what-is-browserscan/?$ /browserscan-guide/
+  RedirectMatch 301 ^/pirate-bay-proxy-alternatives-2026/?$ /best-pirate-bay-proxy/
+  RedirectMatch 301 ^/blog/what-are-residential-proxies/?$ /what-is-a-residential-proxy/
+  RedirectMatch 301 ^/use-cases/ecommerce-scraping/?$ /ecommerce-proxies/
+
+  # Author has only 1 page of posts — collapse any phantom paginated URLs.
+  RedirectMatch 301 ^/author/daniel-cole/page/\d+/?$ /author/daniel-cole/
+</IfModule>
+
 
 # Gzip/deflate text assets — cuts HTML/CSS/JS transfer ~10x.
 <IfModule mod_deflate.c>

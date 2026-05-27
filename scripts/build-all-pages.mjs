@@ -220,6 +220,13 @@ for (const slug of slugs) {
     .replace(/<span\b[^>]*data-cfemail="([0-9a-fA-F]+)"[^>]*>[\s\S]*?<\/span>/gi, (_m, hex) => cfDecode(hex))
     .replace(/href="\/cdn-cgi\/l\/email-protection[^"]*"/gi, 'href="#"');
 
+  // Rewrite href="https://(www.)?ziny.io/..." -> href="/..." so internal
+  // navigation stays on whichever origin is serving the build (staging or prod).
+  // Audit found 343 such absolute links, almost all logo links to the root.
+  body = body
+    .replace(/href=(["'])https?:\/\/(?:www\.)?ziny\.io\/?\1/gi, 'href=$1/$1')
+    .replace(/href=(["'])https?:\/\/(?:www\.)?ziny\.io\//gi, 'href=$1/');
+
   // Mirror referenced assets
   const assets = new Map();
   collectAssets(html, assets); // from raw (catches data-src originals)
