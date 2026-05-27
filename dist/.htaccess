@@ -1,5 +1,9 @@
 # --- Ziny static site: compression + caching (Apache/cPanel) ---
 
+# Serve the captured 1:1 clone of the live ziny.io 404 page on any missing URL.
+ErrorDocument 404 /404.html
+
+
 # Gzip/deflate text assets — cuts HTML/CSS/JS transfer ~10x.
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml

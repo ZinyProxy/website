@@ -1,31 +1,14 @@
 ---
 /**
- * Renders every captured ziny.io page at its original URL.
- * Source: src/captured/<slug>.{body.html, styles.css, bodyclass.txt, scripts.json}
- * (produced by scripts/build-all-pages.mjs from the live site).
- *
- * Scripts are re-emitted as real, executing <script> tags so Elementor's own
- * JS (nested menu/tabs, swiper, sticky, the D3 globe, dashboard motion) runs
- * exactly like the live site. Trailing slashes preserved by astro.config.
+ * Renders the captured ziny.io 404 page.
+ * Source: src/captured/__404.{body.html, head.html, styles.css, ...}
+ * Astro outputs this as dist/404.html, which the host (cPanel/Apache via
+ * .htaccess `ErrorDocument 404 /404.html`) serves on any missing URL.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export async function getStaticPaths() {
-  const dir = 'src/captured';
-  const slugs = readdirSync(dir)
-    .filter((f) => f.endsWith('.body.html'))
-    .map((f) => f.replace(/\.body\.html$/, ''))
-    .filter((s) => s !== 'home') // root is served by src/pages/index.astro
-    .filter((s) => !s.startsWith('__')); // __404 etc. served by their own src/pages/ template
-
-  return slugs.map((slug) => ({
-    params: { slug: slug.replace(/__/g, '/') },
-  }));
-}
-
-const { slug } = Astro.params;
-const file = slug.replace(/\//g, '__');
+const file = '__404';
 const body = readFileSync(join('src/captured', `${file}.body.html`), 'utf8');
 const css = readFileSync(join('src/captured', `${file}.styles.css`), 'utf8');
 let bodyClass = '';
@@ -35,9 +18,6 @@ try { scripts = JSON.parse(readFileSync(join('src/captured', `${file}.scripts.js
 let cssLinks: string[] = [];
 try { cssLinks = JSON.parse(readFileSync(join('src/captured', `${file}.links.json`), 'utf8')); } catch {}
 
-// Captured raw <head> from the live page — full Yoast SEO (title, description,
-// canonical, robots, OG, Twitter, schema.org JSON-LD). Strip stylesheets and
-// inline <style> blocks since we re-inject the locally-mirrored CSS below.
 let headRaw = '';
 try { headRaw = readFileSync(join('src/captured', `${file}.head.html`), 'utf8'); } catch {}
 const head = headRaw
