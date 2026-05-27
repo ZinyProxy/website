@@ -34,24 +34,28 @@ try { scripts = JSON.parse(readFileSync(join('src/captured', `${file}.scripts.js
 let cssLinks: string[] = [];
 try { cssLinks = JSON.parse(readFileSync(join('src/captured', `${file}.links.json`), 'utf8')); } catch {}
 
-let title = `${slug} | Ziny.io`, description = '';
+// Captured raw <head> from the live page — full Yoast SEO (title, description,
+// canonical, robots, OG, Twitter, schema.org JSON-LD). Strip stylesheets and
+// inline <style> blocks since we re-inject the locally-mirrored CSS below.
+let headRaw = '';
+try { headRaw = readFileSync(join('src/captured', `${file}.head.html`), 'utf8'); } catch {}
+const head = headRaw
+  .replace(/<link[^>]+rel=['"]stylesheet['"][^>]*>/gi, '')
+  .replace(/<style[\s\S]*?<\/style>/gi, '');
+
+let lang = 'en';
 try {
-  const meta = JSON.parse(readFileSync(join('reference/pages', file, 'meta.json'), 'utf8'));
-  if (meta.title) title = meta.title;
-  if (meta.description) description = meta.description;
+  const attrs = JSON.parse(readFileSync(join('src/captured', `${file}.html-attrs.json`), 'utf8'));
+  if (attrs.lang) lang = attrs.lang;
 } catch {}
 ---
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    {description && <meta name="description" content={description} />}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Fragment set:html={head} />
     {cssLinks.map((href) => <link rel="stylesheet" href={href} />)}
     <style is:inline set:html={css}></style>
+    <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class={bodyClass}>
     <Fragment set:html={body} />
