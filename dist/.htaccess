@@ -83,4 +83,16 @@ RewriteRule ^author/daniel-cole/page/\d+/?$ /author/daniel-cole/ [R=301,L]
     Header set Pragma "no-cache"
     Header set Expires "0"
   </FilesMatch>
+
+  # --- Security headers (mirrored from dashboard.ziny.io/public/.htaccess) ---
+  # Block clickjacking via invisible iframes.
+  Header set X-Frame-Options "SAMEORIGIN"
+  # Stop browsers from guessing MIME types (forces declared Content-Type).
+  Header set X-Content-Type-Options "nosniff"
+  # Legacy XSS filter — still useful for older browsers that honor it.
+  Header set X-XSS-Protection "1; mode=block"
+  # HSTS: enforce HTTPS for 1 year, include subdomains. Only safe to enable
+  # AFTER cutover when ziny.io is confirmed serving HTTPS everywhere.
+  # (web.ziny.io has valid HTTPS, so this is already safe for staging.)
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 </IfModule>
