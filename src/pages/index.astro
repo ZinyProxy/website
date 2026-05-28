@@ -3,28 +3,44 @@
  * Homepage — 1:1 with live ziny.io. Markup + CSS + original scripts from a
  * live capture (scripts/build-all-pages.mjs). Scripts re-emitted as real tags
  * so Elementor's own JS runs identically (globe, dropdowns, dashboard, swiper).
+ *
+ * Head is the captured raw <head> from the live page — full Yoast SEO
+ * (title, meta description, canonical, robots, OG, Twitter, schema.org
+ * JSON-LD). Mirrors the [...slug].astro logic so both routes share the same
+ * SEO behavior.
  */
 import { readFileSync } from 'node:fs';
-const css = readFileSync('src/captured/home.styles.css', 'utf8');
-const body = readFileSync('src/captured/home.body.html', 'utf8');
+import { join } from 'node:path';
+
+const file = 'home';
+const body = readFileSync(join('src/captured', `${file}.body.html`), 'utf8');
+const css = readFileSync(join('src/captured', `${file}.styles.css`), 'utf8');
 let bodyClass = '';
-try { bodyClass = readFileSync('src/captured/home.bodyclass.txt', 'utf8'); } catch {}
+try { bodyClass = readFileSync(join('src/captured', `${file}.bodyclass.txt`), 'utf8'); } catch {}
 let scripts: { src?: string; code?: string }[] = [];
-try { scripts = JSON.parse(readFileSync('src/captured/home.scripts.json', 'utf8')); } catch {}
+try { scripts = JSON.parse(readFileSync(join('src/captured', `${file}.scripts.json`), 'utf8')); } catch {}
 let cssLinks: string[] = [];
-try { cssLinks = JSON.parse(readFileSync('src/captured/home.links.json', 'utf8')); } catch {}
+try { cssLinks = JSON.parse(readFileSync(join('src/captured', `${file}.links.json`), 'utf8')); } catch {}
+
+let headRaw = '';
+try { headRaw = readFileSync(join('src/captured', `${file}.head.html`), 'utf8'); } catch {}
+const head = headRaw
+  .replace(/<link[^>]+rel=['"]stylesheet['"][^>]*>/gi, '')
+  .replace(/<style[\s\S]*?<\/style>/gi, '');
+
+let lang = 'en';
+try {
+  const attrs = JSON.parse(readFileSync(join('src/captured', `${file}.html-attrs.json`), 'utf8'));
+  if (attrs.lang) lang = attrs.lang;
+} catch {}
 ---
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ziny Proxy | Buy Clean & Reliable Private Proxy Servers</title>
-    <meta name="description" content="Ziny Proxy offers over 30 million IPs across 195 countries. Unrestricted & Unlimited residential proxy, mobile proxy, and datacenter IPs." />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Fragment set:html={head} />
     {cssLinks.map((href) => <link rel="stylesheet" href={href} />)}
     <style is:inline set:html={css}></style>
+    <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class={bodyClass}>
     <Fragment set:html={body} />

@@ -3,31 +3,36 @@
 # Serve the captured 1:1 clone of the live ziny.io 404 page on any missing URL.
 ErrorDocument 404 /404.html
 
+# Serve index.xml when the URL is just a folder (so /feed/ → /feed/index.xml).
+# Without this, Apache falls back to a directory listing and returns 403.
+DirectoryIndex index.html index.xml
+
 # --- 301 redirects (link-audit findings, see reference/link-audit.json) ---
-# Use RedirectMatch with end-anchors so we don't accidentally redirect URLs
-# that *start with* the same prefix (Apache's `Redirect` matches by prefix).
-<IfModule mod_alias.c>
-  # Match live ziny.io's 301: /pricing[/] → /pricing-for-testing-purposes/
-  RedirectMatch 301 ^/pricing/?$ /pricing-for-testing-purposes/
+# Using mod_rewrite (RewriteRule) rather than mod_alias (RedirectMatch) because
+# cPanel's mod_alias didn't fire here even when ErrorDocument worked. mod_rewrite
+# is universally loaded for WordPress sites, so the rules below activate reliably.
+RewriteEngine On
 
-  # Fix WP content typos that produce 404s in-page (38+14+14+... bad in-page links).
-  # NOTE: live ziny.io also 404s these — fixing them on our build is a *deliberate*
-  # divergence from live, to improve UX. Approved by Val 2026-05-27.
-  RedirectMatch 301 ^/social-media-proxy/?$ /social-media-managment/
-  RedirectMatch 301 ^/market-monitoring/?$ /market-research/
-  RedirectMatch 301 ^/ecommerce-proxis/?$ /ecommerce-proxies/
-  RedirectMatch 301 ^/tinder-proxies/?$ /tinder-proxy/
-  RedirectMatch 301 ^/youyube-proxies/?$ /youtube-proxies/
-  RedirectMatch 301 ^/residential-proxies/?$ /residential-proxy/
-  RedirectMatch 301 ^/roblox-proxy/?$ /unblock-roblox/
-  RedirectMatch 301 ^/what-is-browserscan/?$ /browserscan-guide/
-  RedirectMatch 301 ^/pirate-bay-proxy-alternatives-2026/?$ /best-pirate-bay-proxy/
-  RedirectMatch 301 ^/blog/what-are-residential-proxies/?$ /what-is-a-residential-proxy/
-  RedirectMatch 301 ^/use-cases/ecommerce-scraping/?$ /ecommerce-proxies/
+# Match live ziny.io's 301: /pricing[/] → /pricing-for-testing-purposes/
+RewriteRule ^pricing/?$ /pricing-for-testing-purposes/ [R=301,L]
 
-  # Author has only 1 page of posts — collapse any phantom paginated URLs.
-  RedirectMatch 301 ^/author/daniel-cole/page/\d+/?$ /author/daniel-cole/
-</IfModule>
+# Fix WP content typos that produce 404s in-page (38+14+14+... bad in-page links).
+# NOTE: live ziny.io also 404s these — fixing them on our build is a *deliberate*
+# divergence from live, to improve UX. Approved by Val 2026-05-27.
+RewriteRule ^social-media-proxy/?$ /social-media-managment/ [R=301,L]
+RewriteRule ^market-monitoring/?$ /market-research/ [R=301,L]
+RewriteRule ^ecommerce-proxis/?$ /ecommerce-proxies/ [R=301,L]
+RewriteRule ^tinder-proxies/?$ /tinder-proxy/ [R=301,L]
+RewriteRule ^youyube-proxies/?$ /youtube-proxies/ [R=301,L]
+RewriteRule ^residential-proxies/?$ /residential-proxy/ [R=301,L]
+RewriteRule ^roblox-proxy/?$ /unblock-roblox/ [R=301,L]
+RewriteRule ^what-is-browserscan/?$ /browserscan-guide/ [R=301,L]
+RewriteRule ^pirate-bay-proxy-alternatives-2026/?$ /best-pirate-bay-proxy/ [R=301,L]
+RewriteRule ^blog/what-are-residential-proxies/?$ /what-is-a-residential-proxy/ [R=301,L]
+RewriteRule ^use-cases/ecommerce-scraping/?$ /ecommerce-proxies/ [R=301,L]
+
+# Author has only 1 page of posts — collapse any phantom paginated URLs.
+RewriteRule ^author/daniel-cole/page/\d+/?$ /author/daniel-cole/ [R=301,L]
 
 
 # Gzip/deflate text assets — cuts HTML/CSS/JS transfer ~10x.
