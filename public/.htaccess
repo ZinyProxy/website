@@ -1,5 +1,18 @@
 # --- Ziny static site: compression + caching (Apache/cPanel) ---
 
+# Security hardening — mirror dashboard.ziny.io's production .htaccess rules
+# (Val 2026-05-28). Rule 3 from dashboard config (block artisan/composer/etc.)
+# is Laravel-specific and doesn't apply to this static build.
+
+# 1. Disable directory browsing (don't expose folder contents on URLs without
+#    an index file).
+Options -Indexes
+
+# 2. Block any hidden file from being served (.git, .env, .htaccess itself).
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
 # Serve the captured 1:1 clone of the live ziny.io 404 page on any missing URL.
 ErrorDocument 404 /404.html
 
