@@ -11,8 +11,9 @@
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
+import { WP_ORIGIN } from "./_config.mjs";
 
-const ORIGIN = "https://ziny.io";
+const ORIGIN = WP_ORIGIN;
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ziny-rebuild/1.0";
 
 async function fetchBin(url) {

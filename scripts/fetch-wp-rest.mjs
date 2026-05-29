@@ -6,8 +6,9 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { WP_ORIGIN } from "./_config.mjs";
 
-const BASE = "https://ziny.io/wp-json/wp/v2";
+const BASE = `${WP_ORIGIN}/wp-json/wp/v2`;
 const OUT = resolve("reference/wp");
 const PER_PAGE = 100;
 const SLEEP_MS = 250;

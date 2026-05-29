@@ -14,6 +14,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
+import { WP_ORIGIN } from './_config.mjs';
 
 const RAW_DIR = 'reference/raw';
 const OUT_DIR = 'src/captured';
@@ -32,10 +33,10 @@ const slugs = readdirSync(RAW_DIR)
   .filter((s) => !only || only.has(s));
 console.log(`processing ${slugs.length} pages…`);
 
-// --- ziny.io upload URL -> /ziny/<basename> (absolute OR root-relative) ----
-const ZINY_UPLOAD = /(?:(?:https?:)?\/\/ziny\.io)?\/wp-content\/uploads\/(?:[^"'\s)]+\/)?([^\/"'\s)?#]+\.(?:png|jpe?g|webp|svg|gif|avif|woff2?|ttf|otf|eot))/gi;
+// --- ziny.io / cms.ziny.io upload URL -> /ziny/<basename> (absolute OR root-relative) ----
+const ZINY_UPLOAD = /(?:(?:https?:)?\/\/(?:cms\.)?ziny\.io)?\/wp-content\/uploads\/(?:[^"'\s)]+\/)?([^\/"'\s)?#]+\.(?:png|jpe?g|webp|svg|gif|avif|woff2?|ttf|otf|eot))/gi;
 const rewriteUrls = (s) => s.replace(ZINY_UPLOAD, (_m, file) => `/ziny/${file}`);
-const toAbs = (u) => u.replace(/^\/\//, 'https://').replace(/^\/wp-content/, 'https://ziny.io/wp-content');
+const toAbs = (u) => u.replace(/^\/\//, 'https://').replace(/^\/wp-content/, `${WP_ORIGIN}/wp-content`);
 
 // --- collect upload basenames -> a real URL, for mirroring ----------------
 function collectAssets(s, map) {
@@ -63,7 +64,7 @@ async function mirror(file, url, dir = ASSET_DIR) {
 //    which 404s for us -> point to the real Google CDN (serves CORS).
 // 2. Plugin/theme webfonts (Font Awesome, eicons, …) load cross-origin from
 //    ziny.io with NO CORS header -> browser blocks them. Self-host same-origin.
-const ZINY_FONT = /(?:(?:https?:)?\/\/ziny\.io)?\/wp-(?:content|includes)\/[^"'\s)]+?\/([^\/"'\s)?#]+\.(?:woff2?|ttf|eot|otf|svg))(\?[^"'\s)#]*)?(#[^"'\s)]*)?/gi;
+const ZINY_FONT = /(?:(?:https?:)?\/\/(?:cms\.)?ziny\.io)?\/wp-(?:content|includes)\/[^"'\s)]+?\/([^\/"'\s)?#]+\.(?:woff2?|ttf|eot|otf|svg))(\?[^"'\s)#]*)?(#[^"'\s)]*)?/gi;
 function collectFonts(s, map) {
   for (const m of s.matchAll(ZINY_FONT)) {
     if (!map.has(m[1])) map.set(m[1], toAbs(m[0].split('?')[0].split('#')[0]));
@@ -220,12 +221,14 @@ for (const slug of slugs) {
     .replace(/<span\b[^>]*data-cfemail="([0-9a-fA-F]+)"[^>]*>[\s\S]*?<\/span>/gi, (_m, hex) => cfDecode(hex))
     .replace(/href="\/cdn-cgi\/l\/email-protection[^"]*"/gi, 'href="#"');
 
-  // Rewrite href="https://(www.)?ziny.io/..." -> href="/..." so internal
+  // Rewrite href="https://(www.|cms.)?ziny.io/..." -> href="/..." so internal
   // navigation stays on whichever origin is serving the build (staging or prod).
   // Audit found 343 such absolute links, almost all logo links to the root.
+  // Also catches post-cutover cms.ziny.io URLs that WP will inject once siteurl
+  // changes — those still need to resolve to local paths on the public site.
   body = body
-    .replace(/href=(["'])https?:\/\/(?:www\.)?ziny\.io\/?\1/gi, 'href=$1/$1')
-    .replace(/href=(["'])https?:\/\/(?:www\.)?ziny\.io\//gi, 'href=$1/');
+    .replace(/href=(["'])https?:\/\/(?:www\.|cms\.)?ziny\.io\/?\1/gi, 'href=$1/$1')
+    .replace(/href=(["'])https?:\/\/(?:www\.|cms\.)?ziny\.io\//gi, 'href=$1/');
 
   // Mirror referenced assets
   const assets = new Map();

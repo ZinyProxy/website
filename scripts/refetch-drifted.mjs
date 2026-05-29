@@ -9,6 +9,7 @@
  * Run: node scripts/refetch-drifted.mjs
  */
 import { readFileSync, writeFileSync } from "node:fs";
+import { WP_ORIGIN } from "./_config.mjs";
 
 const THRESHOLD = 1.5;
 const report = JSON.parse(readFileSync("reference/source-diff/report.json", "utf8"));
@@ -17,7 +18,7 @@ console.log(`re-fetching ${drifted.length} drifted pages (source-diff > ${THRESH
 
 let ok = 0, fail = 0, skipped = 0;
 for (const r of drifted) {
-  const url = `https://ziny.io${r.path}`;
+  const url = `${WP_ORIGIN}${r.path}`;
   try {
     const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 ziny-rebuild/1.0" } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
