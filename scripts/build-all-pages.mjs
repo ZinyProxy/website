@@ -76,7 +76,28 @@ function localizeFonts(css) {
     .replace(ZINY_FONT, (_m, file, _q, frag = '') => `/ziny-fonts/${file}${frag || ''}`);
 }
 
-// --- un-lazy a single <img> or <source> tag -------------------------------
+// Force every @font-face block to use `font-display: swap`. Replaces any
+// existing value (Font Awesome ships with `block` which blocks text render
+// until the font loads — terrible for perf). Inject if missing.
+function ensureFontDisplaySwap(css) {
+  return css.replace(/@font-face\s*\{([^}]+)\}/gi, (_m, body) => {
+    let b = body;
+    if (/font-display\s*:/i.test(b)) {
+      b = b.replace(/font-display\s*:\s*[a-z]+/gi, 'font-display:swap');
+    } else {
+      b = b + ';font-display:swap';
+    }
+    return `@font-face{${b}}`;
+  });
+}
+
+// --- Convert lazy-load tag to NATIVE browser lazy-load --------------------
+// Previous approach un-lazied (data-src -> src) which forced eager loading
+// of EVERY image — bloated initial payload ~600 KB beyond live. Native
+// `loading="lazy"` defers offscreen images without needing the Elementor JS
+// loader. Result: matches live's lazy behavior, much faster initial load.
+// Also keep data-src around so the JS-driven lazy loader (if used) still
+// works as a fallback.
 function unlazy(tag) {
   const dataSrc = tag.match(/\sdata-src="([^"]*)"/i)?.[1];
   const dataSrcset = tag.match(/\sdata-srcset="([^"]*)"/i)?.[1];
@@ -88,7 +109,12 @@ function unlazy(tag) {
   if (dataSrcset) {
     out = /\ssrcset="/i.test(out) ? out.replace(/\ssrcset="[^"]*"/i, ` srcset="${dataSrcset}"`) : out.replace(/<(img|source)/i, `<$1 srcset="${dataSrcset}"`);
   }
-  return out.replace(/\blazyload\b/g, '').replace(/\sloading="lazy"/gi, '');
+  // Add native lazy + async decode on every <img> if not already present.
+  if (/^<img\b/i.test(out)) {
+    if (!/\sloading=/i.test(out)) out = out.replace(/<img\b/i, '<img loading="lazy"');
+    if (!/\sdecoding=/i.test(out)) out = out.replace(/<img\b/i, '<img decoding="async"');
+  }
+  return out.replace(/\blazyload\b/g, '');
 }
 
 // --- shared external-CSS cache (most pages share Elementor framework CSS) --
@@ -120,7 +146,7 @@ async function ensureSharedCss(url) {
   const f = new Map();
   collectFonts(css, f);
   for (const [file, furl] of f) await mirror(file, furl, FONT_DIR);
-  css = localizeFonts(rewriteUrls(css));
+  css = ensureFontDisplaySwap(localizeFonts(rewriteUrls(css)));
   const name = url.replace(/^https?:\/\//, '').replace(/\?.*$/, '').replace(/[^a-zA-Z0-9.]+/g, '_');
   writeFileSync(join(CSS_DIR, name), css);
   const href = `/ziny-css/${name}`;
@@ -151,7 +177,7 @@ for (const slug of slugs) {
   const fonts = new Map();
   collectFonts(inlineCss, fonts);
   for (const [file, url] of fonts) await mirror(file, url, FONT_DIR);
-  let styles = localizeFonts(rewriteUrls(inlineCss));
+  let styles = ensureFontDisplaySwap(localizeFonts(rewriteUrls(inlineCss)));
 
   // Extract ALL scripts (head + body) IN ORDER so we can re-emit them as real,
   // executing <script> tags. This keeps Elementor's own JS (jQuery, frontend,
