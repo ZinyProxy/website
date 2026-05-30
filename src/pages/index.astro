@@ -33,19 +33,57 @@ try {
   const attrs = JSON.parse(readFileSync(join('src/captured', `${file}.html-attrs.json`), 'utf8'));
   if (attrs.lang) lang = attrs.lang;
 } catch {}
+
+// Perf: preload LCP image candidate (first <img> in body, usually hero/logo)
+const lcpMatch = body.match(/<img[^>]+src="([^"]+)"[^>]*>/i);
+const lcpImage = lcpMatch?.[1] ?? null;
+
+// Perf: critical-vs-deferred CSS split (matches [...slug].astro)
+const CRITICAL_CSS = /reset|theme|header_footer|frontend\.min\.css|widget_image|widget_heading|widget_text_editor/i;
+const criticalCss = cssLinks.filter((h) => CRITICAL_CSS.test(h));
+const deferredCss = cssLinks.filter((h) => !CRITICAL_CSS.test(h));
+
+// Perf: 3rd-party scripts deferred until idle
+const isThirdParty = (s: { src?: string; code?: string }) => {
+  if (s.src && /tawk|googletagmanager|google-analytics|googleadservices|doubleclick|facebook\.net|hotjar|clarity|iconify|cdnjs|jsdelivr/i.test(s.src)) return true;
+  if (s.code && /Tawk_API|gtag\(|fbq\(|googletag/i.test(s.code)) return true;
+  return false;
+};
+const criticalScripts = scripts.filter((s) => !isThirdParty(s));
+const deferredScripts = scripts.filter((s) => isThirdParty(s));
 ---
 <!doctype html>
 <html lang={lang}>
   <head>
     <Fragment set:html={head} />
-    {cssLinks.map((href) => <link rel="stylesheet" href={href} />)}
+    {lcpImage && <link rel="preload" as="image" href={lcpImage} fetchpriority="high" />}
+    {criticalCss.map((href) => <link rel="stylesheet" href={href} />)}
+    {deferredCss.map((href) => (
+      <link rel="preload" as="style" href={href} onload="this.onload=null;this.rel='stylesheet'" />
+    ))}
+    <noscript>{deferredCss.map((href) => <link rel="stylesheet" href={href} />)}</noscript>
     <style is:inline set:html={css}></style>
     <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class={bodyClass}>
     <Fragment set:html={body} />
-    {scripts.map((s) => (s.src
+    {criticalScripts.map((s) => (s.src
       ? <script is:inline src={s.src}></script>
       : <script is:inline set:html={s.code}></script>))}
+    <script is:inline define:vars={{ deferredScripts }}>{`
+      (function () {
+        function load() {
+          for (const s of deferredScripts) {
+            const tag = document.createElement('script');
+            if (s.src) tag.src = s.src;
+            else tag.textContent = s.code;
+            tag.async = true;
+            document.body.appendChild(tag);
+          }
+        }
+        if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 2500 });
+        else setTimeout(load, 1500);
+      })();
+    `}</script>
   </body>
 </html>
