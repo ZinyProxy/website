@@ -111,28 +111,43 @@ function unlazy(tag) {
   if (dataSrcset) {
     out = /\ssrcset="/i.test(out) ? out.replace(/\ssrcset="[^"]*"/i, ` srcset="${dataSrcset}"`) : out.replace(/<(img|source)/i, `<$1 srcset="${dataSrcset}"`);
   }
-  // Add native lazy + async decode on every <img> if not already present.
+  // Add async decode + width/height to every <img>. Lazy-loading and the
+  // LCP-priority decision is handled later in unlazyWithPosition() so we can
+  // mark the first images eager and the rest lazy.
   if (/^<img\b/i.test(out)) {
-    if (!/\sloading=/i.test(out)) out = out.replace(/<img\b/i, '<img loading="lazy"');
     if (!/\sdecoding=/i.test(out)) out = out.replace(/<img\b/i, '<img decoding="async"');
-    // Reserve aspect-ratio for CLS — if width/height missing but EWWW Image
-    // Optimizer recorded dimensions in data-eio-rwidth/rheight, use those.
-    // Otherwise fall back to a generic 1:1 aspect (better than nothing for CLS).
     if (!/\swidth=/i.test(out) || !/\sheight=/i.test(out)) {
       const w = out.match(/data-eio-rwidth="([^"]+)"/i)?.[1];
       const h = out.match(/data-eio-rheight="([^"]+)"/i)?.[1];
       if (w && h) {
         if (!/\swidth=/i.test(out)) out = out.replace(/<img\b/i, `<img width="${w}"`);
         if (!/\sheight=/i.test(out)) out = out.replace(/<img\b/i, `<img height="${h}"`);
-      } else {
-        // No known dims — let aspect-ratio:auto + a placeholder size hold the layout slot.
-        if (!/\sstyle=/i.test(out)) {
-          out = out.replace(/<img\b/i, '<img style="aspect-ratio:auto;min-height:1px"');
-        }
       }
     }
   }
-  return out.replace(/\blazyload\b/g, '');
+  return out.replace(/\blazyload\b/g, '').replace(/\sloading="lazy"/gi, '');
+}
+
+// Apply loading="lazy" to imgs only AFTER the Nth one in the body — first N
+// are above-fold and should load eagerly so LCP isn't delayed. The first img
+// gets fetchpriority="high" (LCP candidate). N=4 covers typical hero + logo +
+// nav images on a wide variety of pages.
+function applyLazyLoading(body) {
+  let imgIndex = 0;
+  return body.replace(/<img\b[^>]*>/gi, (tag) => {
+    const i = imgIndex++;
+    // First image: eager + high priority (LCP candidate)
+    if (i === 0) {
+      if (!/\sfetchpriority=/i.test(tag)) tag = tag.replace(/<img\b/i, '<img fetchpriority="high"');
+      // Don't add loading attr to first img → defaults to eager
+      return tag;
+    }
+    // Images 2-4: eager but no priority hint (above-fold-ish)
+    if (i < 4) return tag;
+    // Everything else: lazy (below-fold)
+    if (!/\sloading=/i.test(tag)) tag = tag.replace(/<img\b/i, '<img loading="lazy"');
+    return tag;
+  });
 }
 
 // --- shared external-CSS cache (most pages share Elementor framework CSS) --
@@ -273,6 +288,11 @@ for (const slug of slugs) {
   body = body
     .replace(/href=(["'])https?:\/\/(?:www\.|cms\.)?ziny\.io\/?\1/gi, 'href=$1/$1')
     .replace(/href=(["'])https?:\/\/(?:www\.|cms\.)?ziny\.io\//gi, 'href=$1/');
+
+  // Final pass: mark first img eager+high-priority (LCP candidate), images
+  // 2-4 eager (above-fold), 5+ lazy. Critical: forcing loading="lazy" on
+  // the LCP image DELAYS LCP by 1-2s on mobile — explicitly opt out for it.
+  body = applyLazyLoading(body);
 
   // Mirror referenced assets
   const assets = new Map();
