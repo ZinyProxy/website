@@ -128,6 +128,39 @@ function unlazy(tag) {
   return out.replace(/\blazyload\b/g, '').replace(/\sloading="lazy"/gi, '');
 }
 
+// Rewrite img src/srcset URLs from /ziny/foo.png → /ziny/foo.png.webp when the
+// .webp companion exists in public/. Apache serves .webp files with the right
+// MIME, so the browser fetches webp directly — saves 20-40% per image vs PNG.
+function preferWebp(body) {
+  const swap = (url) => {
+    if (!/^\/ziny\/.+\.(?:png|jpe?g)$/i.test(url)) return url;
+    const webp = url + '.webp';
+    return existsSync('public' + webp) ? webp : url;
+  };
+  return body.replace(/<img\b([^>]*)>/gi, (_tag, attrs) => {
+    let out = attrs;
+    out = out.replace(/\bsrc="([^"]+)"/i, (_, u) => `src="${swap(u)}"`);
+    out = out.replace(/\bdata-src="([^"]+)"/i, (_, u) => `data-src="${swap(u)}"`);
+    out = out.replace(/\bsrcset="([^"]+)"/i, (_, ss) => {
+      const parts = ss.split(',').map((p) => {
+        const m = p.trim().match(/^(\S+)(\s+\S+)?$/);
+        if (!m) return p.trim();
+        return swap(m[1]) + (m[2] || '');
+      });
+      return `srcset="${parts.join(', ')}"`;
+    });
+    out = out.replace(/\bdata-srcset="([^"]+)"/i, (_, ss) => {
+      const parts = ss.split(',').map((p) => {
+        const m = p.trim().match(/^(\S+)(\s+\S+)?$/);
+        if (!m) return p.trim();
+        return swap(m[1]) + (m[2] || '');
+      });
+      return `data-srcset="${parts.join(', ')}"`;
+    });
+    return '<img' + out + '>';
+  });
+}
+
 // Apply loading="lazy" to imgs only AFTER the Nth one in the body — first N
 // are above-fold and should load eagerly so LCP isn't delayed. The first img
 // gets fetchpriority="high" (LCP candidate). N=4 covers typical hero + logo +
@@ -293,6 +326,15 @@ for (const slug of slugs) {
   // 2-4 eager (above-fold), 5+ lazy. Critical: forcing loading="lazy" on
   // the LCP image DELAYS LCP by 1-2s on mobile — explicitly opt out for it.
   body = applyLazyLoading(body);
+
+  // Replace .png/.jpg src + srcset with .png.webp/.jpg.webp where companion
+  // exists in public/. EWWW Image Optimizer pre-generated 863 webp variants
+  // during the original crawl, but the captured HTML still references the
+  // PNG/JPG paths because the runtime EWWW JS does the swap on live (via
+  // Cloudflare Polish). For our static build we rewrite at build time
+  // instead — direct .webp delivery, no JS needed, ~30-40% bytes saved
+  // per image.
+  body = preferWebp(body);
 
   // Mirror referenced assets
   const assets = new Map();
