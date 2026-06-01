@@ -21,10 +21,12 @@ const OUT_DIR = 'src/captured';
 const ASSET_DIR = 'public/ziny';
 const FONT_DIR = 'public/ziny-fonts';
 const CSS_DIR = 'public/ziny-css';
+const PAGE_CSS_DIR = 'public/styles'; // per-page inline-style CSS bundles
 mkdirSync(OUT_DIR, { recursive: true });
 mkdirSync(ASSET_DIR, { recursive: true });
 mkdirSync(FONT_DIR, { recursive: true });
 mkdirSync(CSS_DIR, { recursive: true });
+mkdirSync(PAGE_CSS_DIR, { recursive: true });
 
 const only = (() => { const i = process.argv.indexOf('--only'); return i >= 0 ? new Set(process.argv[i + 1].split(',')) : null; })();
 const slugs = readdirSync(RAW_DIR)
@@ -113,6 +115,22 @@ function unlazy(tag) {
   if (/^<img\b/i.test(out)) {
     if (!/\sloading=/i.test(out)) out = out.replace(/<img\b/i, '<img loading="lazy"');
     if (!/\sdecoding=/i.test(out)) out = out.replace(/<img\b/i, '<img decoding="async"');
+    // Reserve aspect-ratio for CLS — if width/height missing but EWWW Image
+    // Optimizer recorded dimensions in data-eio-rwidth/rheight, use those.
+    // Otherwise fall back to a generic 1:1 aspect (better than nothing for CLS).
+    if (!/\swidth=/i.test(out) || !/\sheight=/i.test(out)) {
+      const w = out.match(/data-eio-rwidth="([^"]+)"/i)?.[1];
+      const h = out.match(/data-eio-rheight="([^"]+)"/i)?.[1];
+      if (w && h) {
+        if (!/\swidth=/i.test(out)) out = out.replace(/<img\b/i, `<img width="${w}"`);
+        if (!/\sheight=/i.test(out)) out = out.replace(/<img\b/i, `<img height="${h}"`);
+      } else {
+        // No known dims — let aspect-ratio:auto + a placeholder size hold the layout slot.
+        if (!/\sstyle=/i.test(out)) {
+          out = out.replace(/<img\b/i, '<img style="aspect-ratio:auto;min-height:1px"');
+        }
+      }
+    }
   }
   return out.replace(/\blazyload\b/g, '');
 }
@@ -262,6 +280,9 @@ for (const slug of slugs) {
   for (const [file, url] of assets) await mirror(file, url);
 
   writeFileSync(join(OUT_DIR, `${slug}.styles.css`), styles);
+  // ALSO write to public/styles/<slug>.css so Astro can preload-and-swap
+  // it instead of inlining 100-450 KB of render-blocking <style>.
+  writeFileSync(join(PAGE_CSS_DIR, `${slug}.css`), styles);
   writeFileSync(join(OUT_DIR, `${slug}.body.html`), body);
   writeFileSync(join(OUT_DIR, `${slug}.bodyclass.txt`), bodyClass);
   writeFileSync(join(OUT_DIR, `${slug}.scripts.json`), JSON.stringify(scripts));

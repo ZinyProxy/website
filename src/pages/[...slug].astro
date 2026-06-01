@@ -27,7 +27,10 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const file = slug.replace(/\//g, '__');
 const body = readFileSync(join('src/captured', `${file}.body.html`), 'utf8');
-const css = readFileSync(join('src/captured', `${file}.styles.css`), 'utf8');
+// Per-page CSS is now served externally from /styles/<slug>.css (much
+// faster mobile FCP — was being inlined as 100-450 KB render-blocking
+// <style> block). The file is written by scripts/build-all-pages.mjs.
+const pageCssHref = `/styles/${file}.css`;
 let bodyClass = '';
 try { bodyClass = readFileSync(join('src/captured', `${file}.bodyclass.txt`), 'utf8'); } catch {}
 let scripts: { src?: string; code?: string }[] = [];
@@ -81,12 +84,16 @@ const deferredScripts = scripts.filter((s) => isThirdParty(s));
   <head>
     <Fragment set:html={head} />
     {lcpImage && <link rel="preload" as="image" href={lcpImage} fetchpriority="high" />}
+    {/* Preload the per-page CSS so it starts downloading immediately. */}
+    <link rel="preload" as="style" href={pageCssHref} onload="this.onload=null;this.rel='stylesheet'" />
     {criticalCss.map((href) => <link rel="stylesheet" href={href} />)}
     {deferredCss.map((href) => (
       <link rel="preload" as="style" href={href} onload="this.onload=null;this.rel='stylesheet'" />
     ))}
-    <noscript>{deferredCss.map((href) => <link rel="stylesheet" href={href} />)}</noscript>
-    <style is:inline set:html={css}></style>
+    <noscript>
+      <link rel="stylesheet" href={pageCssHref} />
+      {deferredCss.map((href) => <link rel="stylesheet" href={href} />)}
+    </noscript>
     <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class={bodyClass}>

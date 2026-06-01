@@ -157,6 +157,12 @@ RewriteRule ^youtube/?$ /youtube-proxies/ [R=301,L]
   <FilesMatch "\.(css|js|png|jpe?g|webp|svg|ico|woff2?|ttf|otf)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
+  # Per-page CSS bundles in /styles/ — content can change when WP edits land,
+  # so 1-hour cache (vs 1yr for hashed assets above). Still long enough to
+  # benefit repeat visits.
+  <FilesMatch "^/styles/.*\.css$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
   # HTML must never be cached on the staging site — always serve the latest build.
   <FilesMatch "\.html$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
