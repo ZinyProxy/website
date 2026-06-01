@@ -14,9 +14,9 @@ import { join } from 'node:path';
 
 const file = 'home';
 const body = readFileSync(join('src/captured', `${file}.body.html`), 'utf8');
-// Per-page CSS served externally from /styles/home.css (much faster
-// mobile FCP — was being inlined as 453 KB render-blocking <style>).
-const pageCssHref = `/styles/${file}.css`;
+// Inline CSS stays inline — externalizing breaks layout (CLS skyrocketed
+// 0.18 → 0.88 when tried in commit 7295038, rolled back).
+const css = readFileSync(join('src/captured', `${file}.styles.css`), 'utf8');
 let bodyClass = '';
 try { bodyClass = readFileSync(join('src/captured', `${file}.bodyclass.txt`), 'utf8'); } catch {}
 let scripts: { src?: string; code?: string }[] = [];
@@ -59,15 +59,12 @@ const deferredScripts = scripts.filter((s) => isThirdParty(s));
   <head>
     <Fragment set:html={head} />
     {lcpImage && <link rel="preload" as="image" href={lcpImage} fetchpriority="high" />}
-    <link rel="preload" as="style" href={pageCssHref} onload="this.onload=null;this.rel='stylesheet'" />
     {criticalCss.map((href) => <link rel="stylesheet" href={href} />)}
     {deferredCss.map((href) => (
       <link rel="preload" as="style" href={href} onload="this.onload=null;this.rel='stylesheet'" />
     ))}
-    <noscript>
-      <link rel="stylesheet" href={pageCssHref} />
-      {deferredCss.map((href) => <link rel="stylesheet" href={href} />)}
-    </noscript>
+    <noscript>{deferredCss.map((href) => <link rel="stylesheet" href={href} />)}</noscript>
+    <style is:inline set:html={css}></style>
     <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body class={bodyClass}>
