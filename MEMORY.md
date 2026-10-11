@@ -154,12 +154,15 @@ Footer
 - All execution happens through Claude Code on Val's local machine
 - Val pastes prompts from chat-Claude into Claude Code
 - Claude Code reads/writes files in this folder, runs commands, deploys
-## Marketing research (2026-10-11) — see MARKETING_FOCUS.md v2
-- CORRECTION: NetNut is live at netnut.ai (contact-sales, onboarding unverified); 922/Luna/PIA dead;
-  ABCproxy dormant; PYProxy + IP2World relaunched by unverified new owners.
-- Two main bets: (1) conquest machine — /alternatives + /migrate-from pages for dead + unhappy
-  brands, balance-match offer, no-KYC/crypto/non-expiring GB/PAYG; (2) point-of-purchase —
-  antidetect in-app proxy stores (AdsPower/Octo/Hidemyacc), ScrapeOps aggregator, reseller tier,
-  dedicated per-country mobile lines. Enabler: no-card free tier + reviews + recurring affiliate.
-- Do NOT resell/rewrap Firecrawl/Crawl4AI (integrate-only). Synthient flags Ziny "HIGH RISK
-  reseller", 126k IPs visible vs 30M+ claimed — fix claim gap.
+## Marketing pivot (2026-10-11) — see MARKETING_FOCUS.md v3
+- PIVOT: stop selling GB (Rayobyte $0.01/GB, Evomi $0.49). Sell "account-grade infrastructure
+  for operators" per IP / per line / per seat: (1) Account-Grade IPs = 24h-7d sticky resi + ISP
+  per IP with fraud-score-at-generation guarantee; (2) Agency Stack = mobile line + GeeLark/
+  DuoPlus cloud phone + SOP (GeeLark pays 10% rev share); (3) reseller/white-label tier.
+  Secondary: Price Watch $299/mo under Get Data Guarantee.
+- Markets: Brazil (PT-BR site + PIX + BRL) and Canada home turf (CAD, Interac, only CA brand).
+- GTM: /alternatives + /migrate-from conquest pages, antidetect in-app proxy stores, no-KYC-
+  before-purchase, non-expiring GB, recurring 50% affiliate, no-card free tier.
+- Gate first: upstream session TTL >= 24h? true cost/GB? GeeLark credit resale?
+- Corrections: NetNut live at netnut.ai (contact-sales); 922/Luna/PIA dead; PY/IP2 relaunched by
+  unverified owners. Do NOT rewrap Firecrawl/Crawl4AI. Synthient flags Ziny HIGH RISK reseller.
