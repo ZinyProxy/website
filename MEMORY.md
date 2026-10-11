@@ -154,3 +154,9 @@ Footer
 - All execution happens through Claude Code on Val's local machine
 - Val pastes prompts from chat-Claude into Claude Code
 - Claude Code reads/writes files in this folder, runs commands, deploys
+## Marketing research (2026-10-11)
+- Full brief in MARKETING_FOCUS.md. Verdicts: do NOT resell/rewrap Firecrawl/Crawl4AI
+  (integrate-only); focus = honest mid-tier for agencies/e-com scrapers/antidetect
+  operators; fix trust gap first (Synthient flags Ziny "HIGH RISK reseller", 126k IPs
+  visible vs 30M+ claimed); non-expiring GB + true PAYG; IP Clean Score as content engine.
+- IPIDEA/922 takedown Jan 2026 + NetNut seizure Jul 2026 = live migration wedge.
